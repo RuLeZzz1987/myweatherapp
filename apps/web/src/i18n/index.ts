@@ -46,6 +46,21 @@ async function loadCatalog(lang: string): Promise<void> {
   i18next.addResourceBundle(lang, NAMESPACE, mod.default, true, true);
 }
 
+/**
+ * Switch the active UI language. Loads the matching catalog FIRST so
+ * `t()` resolves against real translations on the first render after
+ * the change rather than falling back to English while the dynamic
+ * import is still in flight.
+ *
+ * Consumers (the language picker, deep-link sync, etc.) should call
+ * this instead of `i18next.changeLanguage` directly.
+ */
+export async function setLanguage(lang: string): Promise<void> {
+  if (!isSupportedLocale(lang)) return;
+  await loadCatalog(lang);
+  await i18next.changeLanguage(lang);
+}
+
 function syncHtmlLang(lang: string): void {
   if (typeof document === 'undefined') return;
   document.documentElement.lang = lang;

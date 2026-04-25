@@ -37,6 +37,22 @@ describe('<LanguagePicker />', () => {
     expect(usePrefs.getState().languageOverride).toBe('fr');
   });
 
+  it('loads the catalog before switching so t() resolves against the real translations', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<LanguagePicker />);
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Language' }), 'de');
+
+    // Once the language is reported as 'de' the catalog must already
+    // be registered — otherwise t() would still hand back the en
+    // fallback string for `header.languageLabel`.
+    await waitFor(() => {
+      expect(i18n.language).toBe('de');
+      expect(i18n.hasResourceBundle('de', 'common')).toBe(true);
+    });
+    expect(i18n.t('header.languageLabel')).toBe('Sprache');
+  });
+
   it('renders one option per supported locale', () => {
     renderWithProviders(<LanguagePicker />);
 
