@@ -1,0 +1,28 @@
+name = "myweather-test"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Test-only wrangler config used by `@cloudflare/vitest-pool-workers`. Mirrors
+# the production `wrangler.toml` minus everything tests don't touch:
+#
+# - No `[assets]`: tests only hit `/api/*`, never the SPA fall-through. Keeping
+#   the assets binding here would force CI (and any fresh clone) to build the
+#   SPA before tests can even start, which is fragile.
+# - No `account_id` / `[observability]`: tests run in workerd locally and never
+#   contact Cloudflare's control plane.
+#
+# Bindings that DO need to match production are kept intact (Durable Object
+# class, SQLite migration, env vars) so behavior under test is the same as in
+# prod, modulo the static-asset path.
+
+[[durable_objects.bindings]]
+name = "WEATHER_CACHE"
+class_name = "WeatherCache"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["WeatherCache"]
+
+[vars]
+APP_ENV = "test"
