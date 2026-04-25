@@ -94,7 +94,21 @@ const WEATHER_SEEDS: WeatherSeed[] = [
   { geocode: parisFR, metric: { temperature: 14, weatherCode: 1, isDay: true } },
 ];
 
-function buildWeather(seed: WeatherSeed, units: Units): WeatherResponse {
+interface BuildWeatherOptions {
+  /**
+   * Insert null values into the optional fields Open-Meteo can null
+   * (`hourly[*].precipitationProbability`, `daily[*].uvIndexMax`,
+   * `daily[*].precipitationProbabilityMax`) so tests can exercise the
+   * UI's null-handling paths. Off by default.
+   */
+  sparseOptionals?: boolean;
+}
+
+function buildWeather(
+  seed: WeatherSeed,
+  units: Units,
+  { sparseOptionals = false }: BuildWeatherOptions = {},
+): WeatherResponse {
   // Crude °C → °F so the test fixture is internally consistent. The
   // worker normally sends the right unit upstream; we mirror that here
   // without touching real arithmetic.
@@ -130,7 +144,11 @@ function buildWeather(seed: WeatherSeed, units: Units): WeatherResponse {
     hourly: Array.from({ length: 24 }).map((_, i) => ({
       time: `2026-04-25T${String(i).padStart(2, '0')}:00`,
       temperature: temperature + (i % 5),
-      precipitationProbability: i % 4 === 0 ? 30 : 0,
+      // Mirror Open-Meteo's behaviour: when the precipitation model
+      // lacks coverage for a slot, the field is null. We sprinkle a
+      // few nulls under `sparseOptionals` so UI null-handling has a
+      // realistic fixture to chew on.
+      precipitationProbability: sparseOptionals && i % 3 === 0 ? null : i % 4 === 0 ? 30 : 0,
       weatherCode: seed.metric.weatherCode,
     })),
     daily: Array.from({ length: 7 }).map((_, i) => ({
@@ -142,9 +160,12 @@ function buildWeather(seed: WeatherSeed, units: Units): WeatherResponse {
       apparentTempMin: tempMin - 1,
       sunrise: `2026-04-${String(25 + i).padStart(2, '0')}T05:30`,
       sunset: `2026-04-${String(25 + i).padStart(2, '0')}T20:45`,
-      uvIndexMax: 4,
+      // Day 0 (today) gets a null UV index under sparseOptionals so the
+      // SecondaryStats em-dash branch is reachable from the integration
+      // path; the remaining days still carry numeric values.
+      uvIndexMax: sparseOptionals && i === 0 ? null : 4,
       precipitationSum: 0,
-      precipitationProbabilityMax: 20,
+      precipitationProbabilityMax: sparseOptionals && i === 0 ? null : 20,
       windSpeedMax: units === 'metric' ? 18 : 11,
       windDirectionDominant: 220,
     })),
@@ -195,6 +216,11 @@ export const handlers = [
       );
     }
 
+    // Tests opt in to a "real Open-Meteo can null these" fixture by
+    // passing `name=nullopts`. Saves a per-test `server.use(...)` for
+    // the common null-handling assertion.
+    const sparseOptionals = name === 'nullopts';
+
     const seed = findSeedByLatLon(lat, lon);
     if (!seed) {
       return HttpResponse.json(
@@ -204,9 +230,23 @@ export const handlers = [
             metric: { temperature: 10, weatherCode: 3, isDay: true },
           },
           units,
+          { sparseOptionals },
         ),
       );
     }
-    return HttpResponse.json(buildWeather(seed, units));
+    return HttpResponse.json(buildWeather(seed, units, { sparseOptionals }));
   }),
 ];
+
+/**
+ * Test helper to build the same fixture the MSW handler returns, so unit
+ * tests can pass a realistic `WeatherResponse` (incl. null variants for
+ * the optional fields Open-Meteo can null) into a component without
+ * spinning up the full provider tree.
+ */
+export function buildWeatherFixture(
+  options: { units?: Units; sparseOptionals?: boolean } = {},
+): WeatherResponse {
+  const { units = 'metric', sparseOptionals = false } = options;
+  return buildWeather(WEATHER_SEEDS[0]!, units, { sparseOptionals });
+}

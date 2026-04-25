@@ -2,16 +2,19 @@
  * GET /api/geocode?q=<string>&limit=<n=5>&language=<bcp47>
  *
  * Proxies Open-Meteo's geocoding endpoint with a 24h cache layer keyed on
- * `geo:<lower(q)>:<lang>` (language affects localized fields). See SPEC.md
- * §4.1.
+ * `geo:<lower(q)>:<lang>:<limit>` (language affects localized fields). See
+ * SPEC.md §4.1.
+ *
+ * The cache + upstream interplay (incl. concurrent-request coalescing) lives
+ * inside the `WeatherCache` DO behind `getOrFetch` — this route just shapes
+ * the resulting discriminated union into a wire response.
  */
 
 import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { getCache } from '../do/WeatherCache';
-import type { Env, GeocodeResult } from '../types';
-import { UpstreamError, geocode } from '../upstream/openMeteo';
+import type { Env, GeocodeResponse, GeocodeResult } from '../types';
 
 const GEOCODE_TTL_MS = 24 * 60 * 60 * 1_000;
 
@@ -24,6 +27,10 @@ const Query = z.object({
     .optional(),
 });
 
+/**
+ * What we persist in the DO. The wire payload (`GeocodeResponse`) is just
+ * this plus a non-cached `source` discriminator added on the way out.
+ */
 interface CachedHits {
   results: GeocodeResult[];
   cachedAt: string;
@@ -42,33 +49,27 @@ export const geocodeRoute = new Hono<{ Bindings: Env }>().get('/', async (c) => 
   const { q, limit = 5, language } = parsed.data;
 
   const cache = getCache(c.env);
+  // Whitespace-collapse the query before keying so "new york" and
+  // "new  york" don't fan out into two cache rows. Stays 1:1 with whatever
+  // we pass to upstream (we collapse there too via the same `qNormalized`).
+  const qNormalized = q.trim().replace(/\s+/g, ' ');
   const lang = (language ?? 'en').toLowerCase();
-  const key = `geo:${q.toLowerCase()}:${lang}:${limit}`;
+  const key = `geo:${qNormalized.toLowerCase()}:${lang}:${limit}`;
 
-  const cached = await cache.get<CachedHits>(key);
-  if (cached.hit && cached.payload) {
-    return c.json({ ...cached.payload, source: 'cache' as const });
-  }
-
-  try {
-    const results = await geocode(q, {
-      ...(language !== undefined ? { language } : {}),
+  const result = await cache.getOrFetch<CachedHits>({
+    key,
+    ttlMs: GEOCODE_TTL_MS,
+    kind: 'geocode',
+    params: {
+      q: qNormalized,
       limit,
-    });
-    const payload: CachedHits = { results, cachedAt: new Date().toISOString() };
-    await cache.set(key, payload, GEOCODE_TTL_MS);
+      ...(language !== undefined ? { language } : {}),
+    },
+  });
 
-    return c.json({ ...payload, source: 'upstream' as const });
-  } catch (err) {
-    if (cached.payload) {
-      return c.json({ ...cached.payload, source: 'stale' as const });
-    }
-    if (err instanceof UpstreamError) {
-      return c.json(
-        { error: 'upstream_error', message: err.message },
-        err.status === 504 ? 504 : 502,
-      );
-    }
-    return c.json({ error: 'internal' }, 500);
+  if (result.state === 'error') {
+    return c.json({ error: 'upstream_error' }, result.status);
   }
+
+  return c.json({ ...result.payload, source: result.state } satisfies GeocodeResponse);
 });

@@ -22,7 +22,9 @@
     "error": "Nie udało się wyszukać. Spróbuj ponownie.",
     "clear": "Wyczyść wyszukiwanie",
     "resultsCount_one": "1 wynik dostępny",
-    "resultsCount_other": "{{count}} wyników dostępnych"
+    "resultsCount_few": "{{count}} wyniki dostępne",
+    "resultsCount_many": "{{count}} wyników dostępnych",
+    "resultsCount_other": "{{count}} wyniku dostępnego"
   },
   "empty": {
     "title": "Znajdź pogodę, gdziekolwiek.",

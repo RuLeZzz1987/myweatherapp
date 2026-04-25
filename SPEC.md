@@ -52,7 +52,7 @@
 | Package manager        | **pnpm**                                                                                                                                                           | Required by brief                                                                                                                                                                        |
 | Build tool             | **Vite**                                                                                                                                                           | Required by brief                                                                                                                                                                        |
 | Language               | **TypeScript** (strict)                                                                                                                                            | Type safety, better DX                                                                                                                                                                   |
-| UI framework           | **React 18+**                                                                                                                                                      | Required                                                                                                                                                                                 |
+| UI framework           | **React 19+**                                                                                                                                                      | Required                                                                                                                                                                                 |
 | Styling                | **Tailwind CSS v4** + CSS variables for theming                                                                                                                    | Fast, responsive, design-token friendly                                                                                                                                                  |
 | State                  | React local state + **TanStack Query** (server cache) + small Zustand store for UI prefs                                                                           | Right tool per concern; avoids Redux overkill                                                                                                                                            |
 | Routing                | **No client router** — single `/` route + deep-link via raw `URLSearchParams` (`/?lat=…&lon=…&name=…&lang=de`) wired through the `useUrlSelection` hook (see §6.7) | The app has one screen and one query-string contract; React Router would buy us nothing for that and would add weight to the bundle. Deliberate skip; revisit if a 2nd route ever lands. |
@@ -60,8 +60,7 @@
 | Backend                | **Cloudflare Worker** (Hono) with **Durable Object** (`WeatherCache`)                                                                                              | Required by brief                                                                                                                                                                        |
 | Weather data           | **Open-Meteo** forecast API (free, no registration)                                                                                                                | Locked in; only displays fields free tier returns. CC-BY 4.0 attribution in footer.                                                                                                      |
 | Geocoding              | **Open-Meteo Geocoding** API (free, no registration)                                                                                                               | Same family, same terms                                                                                                                                                                  |
-| Charts                 | **Recharts** or `visx` (pick Recharts; smaller learning surface)                                                                                                   | Hourly forecast viz                                                                                                                                                                      |
-| Icons / weather glyphs | **lucide-react** + custom SVG weather icons mapped from WMO codes                                                                                                  | Crisp, accessible                                                                                                                                                                        |
+| Icons / weather glyphs | **Custom inline SVG weather illustrations** keyed by WMO code (`WeatherIllustration.tsx`)                                                                          | No chart library and no icon-pack dependency: the hourly/daily strips render numbers + small SVGs (not line charts), so Recharts/visx would be unused weight, and a single illustration component covers every weather state with day/night variants. |
 | Testing                | **Vitest** + **React Testing Library** + **@testing-library/user-event** + **MSW**                                                                                 | Unit + integration coverage; no separate E2E rig                                                                                                                                         |
 | Lint / format          | **ESLint** (typescript-eslint, react-hooks, jsx-a11y) + **Prettier**                                                                                               | Required for code quality criterion                                                                                                                                                      |
 | CI                     | GitHub Actions: install → typecheck → lint → test → build                                                                                                          | Catches regressions                                                                                                                                                                      |
@@ -90,84 +89,98 @@ Hack/Staffer/
 │       ├── tsconfig.json
 │       └── src/index.ts            # GeocodeResult, WeatherResponse, …
 └── apps/
-    ├── web/                       # Vite + React frontend
+    ├── web/                          # Vite + React frontend
     │   ├── index.html
-    │   ├── vite.config.ts
+    │   ├── vite.config.ts            # Vite + Vitest + coverage thresholds
     │   ├── tsconfig.json
-    │   ├── src/
-    │   │   ├── main.tsx
-    │   │   ├── App.tsx
-    │   │   # (no router.tsx — single-route SPA, see §3 "Routing" row)
-    │   │   ├── api/
-    │   │   │   ├── client.ts       # fetch wrapper, types
-    │   │   │   └── weather.ts      # query hooks (useWeather, useGeocode)
-    │   │   ├── components/
-    │   │   │   ├── AppHeader.tsx          # brand (top-left) + SearchBar (top-right)
-    │   │   │   ├── SearchBar.tsx          # combobox w/ typeahead
-    │   │   │   ├── CurrentWeatherHero.tsx # centered city + big temp + illustration
-    │   │   │   ├── WeatherIllustration.tsx# large stylized SVG keyed by WMO code
-    │   │   │   ├── RecentSearches.tsx     # "Siste søk" row of city cards
-    │   │   │   ├── RecentSearchCard.tsx
-    │   │   │   ├── HourlyForecast.tsx     # elevation, below the fold
-    │   │   │   ├── DailyForecast.tsx      # elevation, below the fold
-    │   │   │   ├── SecondaryStats.tsx     # feels-like, wind, humidity, sun
-    │   │   │   ├── WeatherIcon.tsx        # small icon variant for cards
-    │   │   │   ├── ErrorState.tsx
-    │   │   │   ├── EmptyState.tsx
-    │   │   │   ├── Skeleton.tsx
-    │   │   │   ├── ThemeBackdrop.tsx
-    │   │   │   └── AttributionFooter.tsx   # CC-BY 4.0 credit to Open-Meteo
-    │   │   ├── hooks/
-    │   │   │   ├── useDebouncedValue.ts
-    │   │   │   ├── useGeolocation.ts
-    │   │   │   ├── useRecentSearches.ts
-    │   │   │   └── usePrefersReducedMotion.ts
-    │   │   ├── i18n/
-    │   │   │   ├── index.ts                # i18next init, language detection, lazy loader
-    │   │   │   ├── supportedLocales.ts     # canonical list + display names + units defaults
-    │   │   │   ├── format.ts               # Intl-based formatters (temp, date, relative time, list, displayName)
-    │   │   │   └── locales/
-    │   │   │       ├── en/common.json      # source-of-truth catalog
-    │   │   │       ├── nb/common.json      # Norwegian Bokmål (matches wireframe)
-    │   │   │       ├── de/common.json
-    │   │   │       ├── fr/common.json
-    │   │   │       ├── es/common.json
-    │   │   │       ├── it/common.json
-    │   │   │       ├── nl/common.json
-    │   │   │       ├── pl/common.json
-    │   │   │       ├── pt/common.json
-    │   │   │       ├── sv/common.json
-    │   │   │       ├── da/common.json
-    │   │   │       └── fi/common.json
-    │   │   ├── lib/
-    │   │   │   ├── wmo.ts          # WMO weather code → i18n key + icon + palette
-    │   │   │   └── units.ts        # metric/imperial toggle (defaults derived from locale)
-    │   │   ├── store/
-    │   │   │   └── prefs.ts        # Zustand: units, themeOverride, languageOverride
-    │   │   ├── styles/
-    │   │   │   └── index.css
-    │   │   └── test/
-    │   │       ├── setup.ts        # MSW server, RTL config, i18n test bootstrap
-    │   │       └── handlers.ts     # MSW handlers for /api/*
-    │   └── tests/
-    │       ├── unit/               # *.test.ts(x)
-    │       └── integration/        # full App rendering w/ MSW
-    └── api/                        # Cloudflare Worker
-        ├── wrangler.toml
+    │   ├── eslint.config.js
+    │   ├── scripts/
+    │   │   └── i18n-check.mjs        # CI gate: parity / placeholders / plural completeness
+    │   ├── test/
+    │   │   ├── setup.ts              # MSW server, RTL config, i18n test bootstrap
+    │   │   ├── handlers.ts           # MSW handlers for /api/*
+    │   │   ├── render.tsx            # `renderWithProviders` helper
+    │   │   └── server.ts             # MSW server wiring
+    │   └── src/
+    │       ├── main.tsx
+    │       ├── App.tsx               # single-route SPA — no router.tsx (see §3 "Routing" row)
+    │       ├── App.test.tsx
+    │       ├── index.css             # Tailwind v4 + CSS variables
+    │       ├── components/           # *.tsx + co-located __tests__/*.test.tsx
+    │       │   ├── AppHeader.tsx               # brand (top-left) + SearchBar (top-right)
+    │       │   ├── SearchBar.tsx               # WAI-ARIA combobox w/ typeahead
+    │       │   ├── CurrentWeatherHero.tsx
+    │       │   ├── WeatherIllustration.tsx     # inline SVG keyed by WMO + day/night
+    │       │   ├── RecentSearches.tsx          # row of recent-city <button>s w/ aria-label
+    │       │   ├── HourlyForecast.tsx
+    │       │   ├── DailyForecast.tsx
+    │       │   ├── SecondaryStats.tsx          # feels-like, wind, humidity, sun
+    │       │   ├── ThemeBackdrop.tsx           # WMO-driven gradient backdrop
+    │       │   ├── UnitsToggle.tsx
+    │       │   ├── LanguagePicker.tsx
+    │       │   ├── OfflineBanner.tsx
+    │       │   ├── LiveRegion.tsx              # polite sr-only announcer
+    │       │   ├── WeatherSkeleton.tsx
+    │       │   ├── ErrorState.tsx
+    │       │   ├── EmptyState.tsx
+    │       │   ├── AttributionFooter.tsx       # CC-BY 4.0 credit to Open-Meteo
+    │       │   └── __tests__/                  # one test file per component
+    │       ├── hooks/
+    │       │   ├── useDebouncedValue.ts
+    │       │   ├── useGeocode.ts               # TanStack Query hook
+    │       │   ├── useWeather.ts               # TanStack Query hook
+    │       │   ├── useOnlineStatus.ts
+    │       │   ├── useUrlSelection.ts          # `?lat&lon&name&lang` ↔ React state
+    │       │   └── __tests__/
+    │       ├── i18n/
+    │       │   ├── index.ts                    # i18next init, detector, lazy loader
+    │       │   ├── supportedLocales.ts         # canonical EU set + units defaults
+    │       │   ├── bestMatch.ts                # navigator.languages → supported tag
+    │       │   ├── format.ts                   # Intl.* formatters (temp, date, rel-time, …)
+    │       │   ├── __tests__/
+    │       │   └── locales/
+    │       │       ├── en/common.json          # source-of-truth catalog
+    │       │       ├── nb/common.json
+    │       │       ├── de/common.json
+    │       │       ├── fr/common.json
+    │       │       ├── es/common.json
+    │       │       ├── it/common.json
+    │       │       ├── nl/common.json
+    │       │       ├── pl/common.json
+    │       │       ├── pt/common.json
+    │       │       ├── sv/common.json
+    │       │       ├── da/common.json
+    │       │       └── fi/common.json
+    │       ├── lib/
+    │       │   ├── api/                        # thin fetch client
+    │       │   │   ├── client.ts               # ApiError + fetchJSON
+    │       │   │   └── types.ts                # re-exports @myweather/contracts
+    │       │   ├── queryClient.ts              # TanStack Query config
+    │       │   ├── wmo.ts                      # WMO → i18n key + icon + palette
+    │       │   ├── units.ts                    # metric/imperial mapping helpers
+    │       │   └── __tests__/
+    │       └── store/
+    │           ├── prefs.ts                    # Zustand: units, languageOverride, recentSearches
+    │           └── __tests__/
+    └── api/                                    # Cloudflare Worker
+        ├── wrangler.toml                       # prod config (no `account_id`; comes from CI env)
+        ├── wrangler.test.toml                  # vitest-pool-workers config
         ├── tsconfig.json
+        ├── vitest.config.ts
         ├── src/
-        │   ├── index.ts            # Hono app, routes
+        │   ├── index.ts                        # Hono app, routes, error handler
         │   ├── routes/
         │   │   ├── weather.ts
         │   │   └── geocode.ts
         │   ├── do/
-        │   │   └── WeatherCache.ts # Durable Object
+        │   │   └── WeatherCache.ts             # Durable Object (SQLite backend)
         │   ├── upstream/
-        │   │   └── openMeteo.ts    # typed upstream client
-        │   └── types.ts            # Worker-only `Env`; wire types re-exported from @myweather/contracts
+        │   │   └── openMeteo.ts                # typed upstream client (Zod-validated)
+        │   └── types.ts                        # Worker `Env`; wire types re-exported from @myweather/contracts
         └── test/
-            ├── weatherCache.test.ts
-            └── routes.test.ts      # uses unstable_dev / miniflare
+            ├── env.d.ts
+            ├── routes.test.ts                  # @cloudflare/vitest-pool-workers
+            └── weatherCache.test.ts
 ```
 
 ---
@@ -192,10 +205,33 @@ All under `/api`.
 - One DO per logical "shard". Use a single named instance `cache` via `idFromName('cache')` for simplicity (we are not high-traffic; brief asks DO as caching layer, not as horizontal scale).
 - Schema (migration on first run): `CREATE TABLE IF NOT EXISTS entries (key TEXT PRIMARY KEY, payload TEXT NOT NULL, expires_at INTEGER NOT NULL)` (we serialize `payload` as JSON).
 - API (internal `fetch` on the DO):
-  - `GET /get?key=...` → 200 `{ hit: true, payload }` if not expired, else 200 `{ hit: false }`.
-  - `POST /set` body `{ key, payload, ttlMs }` → 204.
-  - `POST /purge` body `{ prefix? }` → 204. Internal-only — the worker doesn't expose this on a public route, it's used by integration tests to reset cache between runs and by the alarm GC. Requirements don't ask for an admin-facing purge endpoint, so we deliberately don't ship one.
+  - `POST /get` body `{ key }` → 200 `{ hit, payload?, expired? }`.
+  - `POST /set` body `{ key, payload, ttlMs }` → 200 `{ ok: true }`.
+  - `POST /purge` body `{ prefix? }` → 200 `{ ok: true }`. Internal-only — the worker doesn't expose this on a public route, it's used by integration tests to reset cache between runs and by the alarm GC. Requirements don't ask for an admin-facing purge endpoint, so we deliberately don't ship one.
+  - `POST /get-or-fetch` body `{ key, ttlMs, kind: 'weather' \| 'geocode', params }` → 200 `CoalesceResult` (see below). The atomic "cache-or-upstream" entry point used by routes; performs in-DO request coalescing.
 - Implement a tiny `setAlarm` to GC expired entries hourly (`DELETE FROM entries WHERE expires_at < ?`).
+
+#### 4.2.1 Request coalescing (`/get-or-fetch`)
+
+Free-tier Open-Meteo has a permissive but non-zero rate limit, and our 10-minute weather TTL means a burst of identical concurrent requests on a cold cache (e.g., a Slack-link unfurl that triggers a few previewers at once) would otherwise fan out to N upstream calls for the same lat/lon. We collapse those into a single outbound request via an in-DO "in-flight" map.
+
+Why the DO is the right home for this:
+
+- The DO already serializes by key (we route every request to the singleton `idFromName('cache')`), so a plain `Map<string, Promise>` is enough — no distributed lock, no race window beyond the single instance's microtask queue.
+- Cloudflare's input-gate model lets the DO interleave concurrent `fetch()` calls at `await` boundaries; a second caller arriving while an upstream call is suspended sees the existing in-flight entry and joins it.
+- It's free-tier compatible: no KV transactions, no extra binding, and no extra subrequests.
+
+Algorithm:
+
+1. **Cache hit?** Read the row; if `expires_at >= now`, return `{ state: 'cache', payload }`.
+2. **In-flight?** If `inflight.get(key)` is set, `await` it and forward its result; do not call upstream.
+3. **Cold path:** Register a fresh promise in `inflight`, call upstream (`forecast`/`geocode` per `kind`), then on the same promise:
+   - **Success** → write the payload into SQLite with the requested TTL, resolve `{ state: 'upstream', payload }`.
+   - **Upstream failure with an expired row available** → resolve `{ state: 'stale', payload }`.
+   - **Upstream failure, no row** → resolve `{ state: 'error', status: 502 \| 504 }` (504 only when the upstream request was aborted).
+   On promise settle (success or failure), the entry is removed from `inflight` so the next cold call can attempt a fresh fetch.
+
+The route layer treats the discriminated union as the only thing worth pattern-matching — see `apps/api/src/routes/{weather,geocode}.ts`. Test contract: `apps/api/test/weatherCache.test.ts` "/get-or-fetch coalescing".
 
 ### 4.3 Upstream client (`openMeteo.ts`)
 
@@ -335,7 +371,7 @@ Use container queries (`@container`) for the hero so the temperature size tracks
 
 - Combobox pattern for search (WAI-ARIA: `role=combobox`, `aria-expanded`, `aria-activedescendant`, full keyboard nav).
 - All decorative icons / illustrations `aria-hidden="true"`; weather condition is always available as text in the DOM in the active locale (en: `Partly cloudy, 27°`; nb: `Delvis skyet, 27°`) even when only `27°` is visually shown.
-- Recent-search cards are real `<button>` elements with descriptive `aria-label` built from i18n keys with ICU interpolation (en: `Show weather for Oslo, 25 degrees`).
+- Recent-search cards are real `<button>` elements with descriptive `aria-label` built from i18n keys (en: `Show weather for Oslo, currently 25°C`). The `{{temp}}` placeholder is a pre-formatted string from `formatTemperature()` (Intl.NumberFormat with the `unit` style), so the unit symbol is locale- and unit-system-aware (°C vs °F, French uses U+00A0 NBSP between number and unit, etc.).
 - Color contrast ≥ AA across themes (spot-checked against a stable token system).
 - Focus rings preserved, focus trap nowhere; skip-link to main content.
 - `prefers-reduced-motion` disables backdrop animation and chart transitions.
@@ -426,7 +462,7 @@ Units default per locale (metric for all currently-supported locales) but the us
 | `empty.prompt`             | Search for a city to see the weather    | Søk etter en by for å se været      | Suchen Sie nach einer Stadt, um das Wetter zu sehen   |
 | `empty.useLocation`        | Use my location                         | Bruk min posisjon                   | Meinen Standort verwenden                             |
 | `recents.title`            | Recent searches                         | Siste søk                           | Letzte Suchen                                         |
-| `recents.cardLabel`        | Show weather for {city}, {temp} degrees | Vis vær for {city}, {temp} grader   | Wetter für {city} anzeigen, {temp} Grad               |
+| `recents.cardLabel`        | Show weather for {{city}}, currently {{temp}} | Vis vær for {{city}}, nå {{temp}}     | Wetter für {{city}} anzeigen, aktuell {{temp}}        |
 | `weather.feelsLike`        | Feels like {temp}                       | Føles som {temp}                    | Gefühlt {temp}                                        |
 | `weather.code.0`           | Clear sky                               | Klart                               | Klarer Himmel                                         |
 | `weather.code.61`          | Light rain                              | Lett regn                           | Leichter Regen                                        |
@@ -498,22 +534,28 @@ export interface WeatherResponse {
   };
   hourly: Array<{
     time: string;
+    /** Anchor — entries with a null upstream temperature are dropped. */
     temperature: number;
-    precipitationProbability: number;
+    /** Open-Meteo can null this when the precipitation model lacks coverage. */
+    precipitationProbability: number | null;
     weatherCode: number;
   }>;
   daily: Array<{
     date: string;
     weatherCode: number;
+    /** Anchor — entries with null max OR min are dropped. */
     tempMax: number;
+    /** Anchor — entries with null max OR min are dropped. */
     tempMin: number;
     apparentTempMax: number;
     apparentTempMin: number;
     sunrise: string; // ISO, location-local
     sunset: string; // ISO, location-local
-    uvIndexMax: number;
+    /** Null near the poles in winter / when the model has no UV signal. */
+    uvIndexMax: number | null;
     precipitationSum: number;
-    precipitationProbabilityMax: number;
+    /** Null when the model lacks precipitation coverage for the day. */
+    precipitationProbabilityMax: number | null;
     windSpeedMax: number;
     windDirectionDominant: number;
   }>;
@@ -622,3 +664,20 @@ Deployment URL is published to the workflow summary, the README, and any PR desc
 13. Deploy via `wrangler deploy` (single Worker, Static Assets binding to `apps/web/dist`, SQLite-backed `WeatherCache` DO); verify `/api/*` and the SPA both served from the resulting `*.workers.dev` URL; capture URL; finalize README (call out wireframe match, the elevations, the i18n architecture + how to add a locale, and the deploy story).
 
 Each step is a self-contained commit/PR-sized chunk so progress is reviewable. Step 7 is the "screenshot moment" — once it lands, visiting `/?lang=nb` should be visually identical to `wireframe.png` for the happy path before anything else is layered on.
+
+---
+
+## 11. Security headers
+
+A small middleware in `apps/api/src/index.ts` (`applySecurityHeaders`) stamps these on every response — both `/api/*` JSON and the SPA HTML/JS/CSS served via `env.ASSETS.fetch` — unless an underlying handler already set its own value:
+
+| Header                                  | Value                                                | Why                                                                                              |
+| --------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `Strict-Transport-Security`             | `max-age=31536000; includeSubDomains`                | `*.workers.dev` is HTTPS-only; pin browsers to never downgrade.                                  |
+| `X-Content-Type-Options`                | `nosniff`                                            | JSON shouldn't be sniffed as HTML; SPA `text/html` doesn't need MIME guessing.                   |
+| `X-Frame-Options`                       | `DENY`                                               | We never embed ourselves in an iframe; cheap clickjacking insurance.                             |
+| `Referrer-Policy`                       | `strict-origin-when-cross-origin`                    | No referrer leak on the Open-Meteo attribution link or any future external link.                 |
+| `Permissions-Policy`                    | `geolocation=(), camera=(), microphone=()`           | Browser-side feature lockout. Will relax `geolocation=(self)` if/when the "use my location" flow lands. |
+| `X-Permitted-Cross-Domain-Policies`     | `none`                                               | Locks down legacy Flash / Acrobat cross-domain probes.                                           |
+
+**No `Content-Security-Policy` is set.** Vite ships hashed inline-style attributes (Tailwind v4 + React inline `style={{…}}`) and inline module preloads, so any non-trivial `style-src`/`script-src` would break the build without a build-time nonce/hash pipeline. The cost-vs-benefit doesn't pencil out for a public, read-only weather UI with no auth, no PII, and one upstream. We documented this trade-off explicitly so a future hardening pass knows where to start (Vite plugin → CSP nonce → strict-dynamic).

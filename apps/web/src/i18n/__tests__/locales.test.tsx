@@ -40,6 +40,20 @@ const enFlat = flatten(enCommon);
 const enKeys = Object.keys(enFlat).sort();
 const nonEnLocales = SUPPORTED_LOCALES.filter((l) => l !== 'en');
 
+/**
+ * i18next plural-suffix convention: `key_<category>`. Different locales
+ * pick different CLDR categories (Polish has `_one|_few|_many|_other`,
+ * English `_one|_other`), so for parity we compare *base* keys, not
+ * literal keys. See `scripts/i18n-check.mjs` for the same logic.
+ */
+const PLURAL_SUFFIX_RE = /_(zero|one|two|few|many|other)$/;
+function baseKeysOf(keys: string[]): string[] {
+  const seen = new Set<string>();
+  for (const k of keys) seen.add(k.replace(PLURAL_SUFFIX_RE, ''));
+  return [...seen].sort();
+}
+const enBaseKeys = baseKeysOf(enKeys);
+
 describe('locale catalogs', () => {
   beforeAll(async () => {
     await i18n.changeLanguage('en');
@@ -49,13 +63,13 @@ describe('locale catalogs', () => {
     await i18n.changeLanguage('en');
   });
 
-  it.each(nonEnLocales)('%s catalog has the same key set as en', async (lang) => {
+  it.each(nonEnLocales)('%s catalog has the same base key set as en', async (lang) => {
     const path = `../locales/${lang}/common.json`;
     const importer = lazyCatalogs[path];
     expect(importer, `expected catalog ${path}`).toBeDefined();
     const mod = await importer!();
     const flat = flatten(mod.default);
-    expect(Object.keys(flat).sort()).toEqual(enKeys);
+    expect(baseKeysOf(Object.keys(flat))).toEqual(enBaseKeys);
   });
 
   it.each(nonEnLocales)('%s loads through i18next and translates probe keys', async (lang) => {

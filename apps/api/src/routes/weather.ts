@@ -9,6 +9,10 @@
  * `name` and `country` are forwarded from the geocoder (Open-Meteo's forecast
  * endpoint doesn't echo them) so the SPA doesn't need a second request to
  * label the response.
+ *
+ * The cache + upstream interplay (incl. concurrent-request coalescing) lives
+ * inside the `WeatherCache` DO behind `getOrFetch` — this route just shapes
+ * the resulting discriminated union into a wire response.
  */
 
 import { Hono } from 'hono';
@@ -16,7 +20,6 @@ import { z } from 'zod';
 
 import { getCache } from '../do/WeatherCache';
 import type { Env, WeatherResponse } from '../types';
-import { UpstreamError, forecast } from '../upstream/openMeteo';
 
 const WEATHER_TTL_MS = 10 * 60 * 1_000;
 
@@ -45,32 +48,21 @@ export const weatherRoute = new Hono<{ Bindings: Env }>().get('/', async (c) => 
   const cache = getCache(c.env);
   const key = `wx:${round4(lat)}:${round4(lon)}:${units}`;
 
-  const cached = await cache.get<WeatherResponse>(key);
-  if (cached.hit && cached.payload) {
-    return c.json({ ...cached.payload, source: 'cache' as const } satisfies WeatherResponse);
+  const result = await cache.getOrFetch<WeatherResponse>({
+    key,
+    ttlMs: WEATHER_TTL_MS,
+    kind: 'weather',
+    params: { lat, lon, units, name, country },
+  });
+
+  if (result.state === 'error') {
+    return c.json({ error: 'upstream_error' }, result.status);
   }
 
-  try {
-    const fresh = await forecast(lat, lon, name, country, { units });
-    const response: WeatherResponse = {
-      ...fresh,
-      fetchedAt: new Date().toISOString(),
-      source: 'upstream',
-    };
-    await cache.set(key, response, WEATHER_TTL_MS);
-    return c.json(response);
-  } catch (err) {
-    if (cached.payload) {
-      return c.json({ ...cached.payload, source: 'stale' as const } satisfies WeatherResponse);
-    }
-    if (err instanceof UpstreamError) {
-      return c.json(
-        { error: 'upstream_error', message: err.message },
-        err.status === 504 ? 504 : 502,
-      );
-    }
-    return c.json({ error: 'internal' }, 500);
-  }
+  // The stored payload always has `source: 'upstream'` and a `fetchedAt` we
+  // populated when we wrote the row. Override `source` with whatever the DO
+  // observed for *this* request (cache hit / fresh upstream / stale).
+  return c.json({ ...result.payload, source: result.state } satisfies WeatherResponse);
 });
 
 function round4(n: number): string {

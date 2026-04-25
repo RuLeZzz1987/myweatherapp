@@ -64,14 +64,14 @@ function App() {
   // its first weather payload, promote it onto the recents strip so a
   // shared link backfills the card. We don't bump position on every
   // refetch — the explicit selection handlers below own ordering.
-  const weatherDataRef = weatherQuery.data;
+  const weatherData = weatherQuery.data;
   useEffect(() => {
-    if (!selection || !weatherDataRef) return;
+    if (!selection || !weatherData) return;
     if (recents.some((r) => r.id === selection.id)) return;
-    const fromSelection = inferGeocodeFromSelectionAndWeather(selection, weatherDataRef);
+    const fromSelection = inferGeocodeFromSelectionAndWeather(selection, weatherData);
     if (!fromSelection) return;
     pushRecentSearch(fromSelection);
-  }, [selection, weatherDataRef, recents, pushRecentSearch]);
+  }, [selection, weatherData, recents, pushRecentSearch]);
 
   function handleCitySelect(result: GeocodeResult) {
     pushRecentSearch(result);

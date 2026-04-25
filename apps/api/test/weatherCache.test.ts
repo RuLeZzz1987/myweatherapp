@@ -4,7 +4,7 @@
  * instance via `runInDurableObject` so cache state never leaks across cases.
  */
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { env, runInDurableObject } from 'cloudflare:test';
 
 import { WeatherCache } from '../src/do/WeatherCache';
@@ -122,5 +122,150 @@ describe('WeatherCache', () => {
   // import lint doesn't fire. The class itself is reached via env.WEATHER_CACHE.
   it('exports the DO class for the runtime', () => {
     expect(WeatherCache).toBeDefined();
+  });
+
+  describe('/get-or-fetch coalescing', () => {
+    let fetchSpy: ReturnType<typeof vi.spyOn> | undefined;
+    let upstreamCalls: number;
+    let releaseGate: (() => void) | undefined;
+    let upstreamGate: Promise<void> | undefined;
+
+    beforeEach(() => {
+      upstreamCalls = 0;
+      upstreamGate = new Promise<void>((resolve) => {
+        releaseGate = resolve;
+      });
+      fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
+        upstreamCalls += 1;
+        // Hold every upstream call open until the test releases the gate;
+        // this lets us prove that two in-flight /get-or-fetch invocations
+        // share the same outbound fetch instead of fanning out.
+        await upstreamGate;
+        return new Response(
+          JSON.stringify({
+            results: [
+              {
+                id: 99,
+                name: 'Paris',
+                latitude: 48.85,
+                longitude: 2.35,
+                country: 'France',
+                country_code: 'FR',
+                timezone: 'Europe/Paris',
+              },
+            ],
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        );
+      });
+    });
+
+    afterEach(() => {
+      releaseGate?.();
+      fetchSpy?.mockRestore();
+    });
+
+    it('coalesces concurrent identical /get-or-fetch calls into one upstream hit', async () => {
+      const { stub } = getStub();
+
+      // Fire two concurrent /get-or-fetch calls with the same key. Both
+      // must enter the DO before either's upstream promise resolves —
+      // input gates allow that interleaving.
+      const a = stub.fetch('https://do/get-or-fetch', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'geo:paris:fr:5',
+          ttlMs: 60_000,
+          kind: 'geocode',
+          params: { q: 'Paris', limit: 5, language: 'fr' },
+        }),
+      });
+      const b = stub.fetch('https://do/get-or-fetch', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'geo:paris:fr:5',
+          ttlMs: 60_000,
+          kind: 'geocode',
+          params: { q: 'Paris', limit: 5, language: 'fr' },
+        }),
+      });
+
+      // Microtask drain so both requests are sitting in the DO before we
+      // let upstream resolve.
+      await new Promise((r) => setTimeout(r, 0));
+      releaseGate?.();
+
+      const [resA, resB] = await Promise.all([a, b]);
+      expect(resA.status).toBe(200);
+      expect(resB.status).toBe(200);
+      expect(upstreamCalls).toBe(1);
+
+      const bodyA = (await resA.json()) as {
+        state: string;
+        payload: { results: Array<{ name: string }> };
+      };
+      const bodyB = (await resB.json()) as {
+        state: string;
+        payload: { results: Array<{ name: string }> };
+      };
+      expect(bodyA.state).toBe('upstream');
+      // The second caller might be observed as `upstream` (joined the in-
+      // flight) or as `cache` (arrived after the row was committed) — both
+      // are correct outcomes; what matters is that no second upstream call
+      // happened.
+      expect(['upstream', 'cache']).toContain(bodyB.state);
+      expect(bodyB.payload.results[0]?.name).toBe('Paris');
+    });
+
+    it('returns state:cache on subsequent calls within TTL', async () => {
+      const { stub } = getStub();
+
+      releaseGate?.();
+      const first = await stub.fetch('https://do/get-or-fetch', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'geo:london:en:5',
+          ttlMs: 60_000,
+          kind: 'geocode',
+          params: { q: 'London', limit: 5, language: 'en' },
+        }),
+      });
+      expect(((await first.json()) as { state: string }).state).toBe('upstream');
+      expect(upstreamCalls).toBe(1);
+
+      const second = await stub.fetch('https://do/get-or-fetch', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'geo:london:en:5',
+          ttlMs: 60_000,
+          kind: 'geocode',
+          params: { q: 'London', limit: 5, language: 'en' },
+        }),
+      });
+      expect(((await second.json()) as { state: string }).state).toBe('cache');
+      expect(upstreamCalls).toBe(1);
+    });
+
+    it('returns state:error with no cache and upstream failure', async () => {
+      // Replace the mock to fail upstream.
+      fetchSpy?.mockRestore();
+      fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(async () => new Response('', { status: 503 }));
+
+      const { stub } = getStub();
+      const res = await stub.fetch('https://do/get-or-fetch', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'geo:nowhere:en:5',
+          ttlMs: 60_000,
+          kind: 'geocode',
+          params: { q: 'Nowhereville', limit: 5, language: 'en' },
+        }),
+      });
+      const body = (await res.json()) as { state: string; status?: number };
+      expect(body.state).toBe('error');
+      expect(body.status).toBe(502);
+    });
   });
 });

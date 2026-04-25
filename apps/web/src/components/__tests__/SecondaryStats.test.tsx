@@ -117,6 +117,19 @@ describe('<SecondaryStats />', () => {
     expect(screen.getByText('20%')).toBeInTheDocument();
   });
 
+  it('renders an em-dash for UV index when daily[0].uvIndexMax is null', () => {
+    // Open-Meteo can null UV near the poles in winter / when the model
+    // has no UV signal. We must not silently render that as "0" — the
+    // component prints "—" instead. See SPEC §6 nullability notes.
+    const weather = buildWeather();
+    weather.daily[0]!.uvIndexMax = null;
+    renderWithProviders(<SecondaryStats weather={weather} units="metric" locale="en" />);
+
+    const uvLabel = screen.getByText('UV index');
+    const uvValue = uvLabel.parentElement?.querySelector('dd');
+    expect(uvValue?.textContent).toBe('—');
+  });
+
   it('shows precipitation probability only when present', () => {
     const a = buildWeather();
     renderWithProviders(<SecondaryStats weather={a} units="metric" locale="en" />);
