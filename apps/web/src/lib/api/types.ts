@@ -27,3 +27,58 @@ export interface GeocodeResponse {
   cachedAt: string;
   source: 'cache' | 'upstream' | 'stale';
 }
+
+export interface WeatherCurrent {
+  time: string;
+  temperature: number;
+  apparentTemperature: number;
+  humidity: number;
+  windSpeed: number;
+  windDirection: number;
+  precipitation: number;
+  precipitationProbability?: number;
+  cloudCover: number;
+  pressureMsl: number;
+  weatherCode: number;
+  isDay: boolean;
+}
+
+export interface WeatherHourly {
+  time: string;
+  temperature: number;
+  precipitationProbability: number;
+  weatherCode: number;
+}
+
+export interface WeatherDaily {
+  date: string;
+  weatherCode: number;
+  tempMax: number;
+  tempMin: number;
+  apparentTempMax: number;
+  apparentTempMin: number;
+  sunrise: string;
+  sunset: string;
+  uvIndexMax: number;
+  precipitationSum: number;
+  precipitationProbabilityMax: number;
+  windSpeedMax: number;
+  windDirectionDominant: number;
+}
+
+export interface WeatherResponse {
+  location: {
+    name: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+    timezone: string;
+  };
+  units: Units;
+  current: WeatherCurrent;
+  hourly: WeatherHourly[];
+  daily: WeatherDaily[];
+  fetchedAt: string;
+  source: 'cache' | 'upstream' | 'stale';
+  attribution: 'Open-Meteo';
+}

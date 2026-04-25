@@ -28,23 +28,26 @@ function getLanguagePicker() {
 describe('<App />', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en');
-    usePrefs.setState({ units: 'metric', languageOverride: null });
+    usePrefs.setState({ units: 'metric', languageOverride: null, recentSearches: [] });
     localStorage.removeItem(PREFS_STORAGE_KEY);
+    window.history.replaceState(null, '', '/');
   });
 
   afterEach(async () => {
     await i18n.changeLanguage('en');
-    usePrefs.setState({ units: 'metric', languageOverride: null });
+    usePrefs.setState({ units: 'metric', languageOverride: null, recentSearches: [] });
     localStorage.removeItem(PREFS_STORAGE_KEY);
+    window.history.replaceState(null, '', '/');
   });
 
-  it('renders the brand and English copy by default', () => {
+  it('renders the brand and English empty-state copy by default', () => {
     renderWithProviders(<App />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'MyWeather' })).toBeInTheDocument();
-    expect(screen.getByText('Welcome to MyWeather')).toBeInTheDocument();
-    expect(screen.getByText(/Personalized weather/i)).toBeInTheDocument();
-    expect(screen.getByText('Search for a city to see the weather')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: /Find the weather/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Search for a city to see/i)).toBeInTheDocument();
   });
 
   it('renders both header controls and the search combobox', () => {
@@ -103,6 +106,44 @@ describe('<App />', () => {
 
     await waitFor(() => {
       expect(window.localStorage.getItem(STORAGE_KEY)).toBe('sv');
+    });
+  });
+
+  describe('search → hero → recents flow', () => {
+    it('renders the hero and recent strip after the user selects a city', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<App />);
+
+      const search = screen.getByRole('combobox', { name: 'Search for a city' });
+      await user.type(search, 'oslo');
+
+      const option = await screen.findByRole('option', { name: /Oslo/ });
+      await user.click(option);
+
+      // Hero renders the chosen city.
+      expect(await screen.findByRole('heading', { level: 2, name: 'Oslo' })).toBeInTheDocument();
+      // URL deep-link landed.
+      const params = new URLSearchParams(window.location.search);
+      expect(params.get('name')).toBe('Oslo');
+      expect(params.get('lat')).toBe('59.9139');
+      // Recent strip lit up.
+      expect(screen.getByText('Recent searches')).toBeInTheDocument();
+    });
+
+    it('boots into the hero from a deep-linked URL', async () => {
+      window.history.replaceState(
+        null,
+        '',
+        '/?lat=59.9139&lon=10.7522&name=Oslo&country=Norway&id=osl',
+      );
+
+      renderWithProviders(<App />);
+
+      // Loading status is announced before the request resolves.
+      expect(screen.getByRole('status')).toHaveTextContent(/Loading weather/i);
+
+      // Then the hero renders.
+      expect(await screen.findByRole('heading', { level: 2, name: 'Oslo' })).toBeInTheDocument();
     });
   });
 });

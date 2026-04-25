@@ -1,4 +1,4 @@
-import type { GeocodeResponse } from './types';
+import type { GeocodeResponse, Units, WeatherResponse } from './types';
 
 /**
  * Thin fetch wrapper for the MyWeather Worker API. We deliberately stay at
@@ -63,4 +63,39 @@ export async function fetchGeocode(
     throw await readError(res, `Geocoding failed (${res.status})`);
   }
   return (await res.json()) as GeocodeResponse;
+}
+
+export interface FetchWeatherArgs {
+  lat: number;
+  lon: number;
+  units: Units;
+  name?: string;
+  country?: string;
+  signal?: AbortSignal;
+}
+
+export async function fetchWeather({
+  lat,
+  lon,
+  units,
+  name,
+  country,
+  signal,
+}: FetchWeatherArgs): Promise<WeatherResponse> {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lon: String(lon),
+    units,
+  });
+  if (name) params.set('name', name);
+  if (country) params.set('country', country);
+
+  const res = await fetch(`/api/weather?${params.toString()}`, {
+    signal,
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) {
+    throw await readError(res, `Weather request failed (${res.status})`);
+  }
+  return (await res.json()) as WeatherResponse;
 }

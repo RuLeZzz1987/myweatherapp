@@ -65,9 +65,20 @@ export function formatRelativeTime(from: Date | string, to: Date | string, local
   return rtf.format(Math.round(seconds / 86400), 'day');
 }
 
-/** "Norway" / "Norge" / "Norwegen" from an ISO 3166-1 alpha-2 code. */
+/**
+ * "Norway" / "Norge" / "Norwegen" from an ISO 3166-1 alpha-2 code.
+ *
+ * Returns an empty string when `code` is empty so callers don't have to
+ * pre-guard. Returns the code itself if `Intl.DisplayNames` can't
+ * recognize it (unknown subdivisions, malformed codes, etc.).
+ */
 export function formatCountry(code: string, locale: string): string {
-  return new Intl.DisplayNames(locale, { type: 'region' }).of(code) ?? code;
+  if (!code) return '';
+  try {
+    return new Intl.DisplayNames(locale, { type: 'region' }).of(code) ?? code;
+  } catch {
+    return code;
+  }
 }
 
 /** "English" / "Englisch" / "Engelsk" from a BCP-47 language tag. */

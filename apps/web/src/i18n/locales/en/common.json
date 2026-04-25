@@ -1,8 +1,8 @@
 {
   "brand": "MyWeather",
   "app": {
-    "greeting": "Welcome to MyWeather",
-    "tagline": "Personalized weather, in your language."
+    "skipToContent": "Skip to main content",
+    "main": "Weather"
   },
   "header": {
     "searchLabel": "Search for a city",
@@ -19,33 +19,117 @@
     "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
     "noResults": "No matches",
     "loading": "Searching…",
-    "error": "Couldn't search. Try again."
+    "error": "Couldn't search. Try again.",
+    "clear": "Clear search"
   },
   "empty": {
-    "prompt": "Search for a city to see the weather",
+    "title": "Find the weather, anywhere.",
+    "prompt": "Search for a city to see the current conditions and the week ahead.",
     "useLocation": "Use my location"
   },
   "recents": {
     "title": "Recent searches",
-    "cardLabel": "Show weather for {{city}}, {{temp}} degrees"
+    "cardLabel": "Show weather for {{city}}, currently {{temp}}",
+    "remove": "Remove {{city}} from recent searches",
+    "clearAll": "Clear all"
+  },
+  "hero": {
+    "loading": "Loading weather…",
+    "labelTemperature": "Current temperature",
+    "labelCondition": "Current condition",
+    "feelsLike": "Feels like {{temp}}",
+    "asOf": "As of {{time}}",
+    "cached": "Cached {{ago}}",
+    "stale": "Showing cached data — upstream unavailable",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Conditions",
+    "humidity": "Humidity",
+    "humidityValue": "{{value}}%",
+    "wind": "Wind",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Pressure",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Cloud cover",
+    "cloudCoverValue": "{{value}}%",
+    "uvIndex": "UV index",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "precipitation": "Precipitation",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Chance of rain",
+    "windDir": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SW",
+      "W": "W",
+      "NW": "NW"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "in"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Next 24 hours",
+    "dailyTitle": "Next 7 days",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: high {{high}}, low {{low}}, {{condition}}"
   },
   "weather": {
-    "feelsLike": "Feels like {{temp}}",
     "code": {
       "0": "Clear sky",
-      "61": "Light rain"
+      "1": "Mainly clear",
+      "2": "Partly cloudy",
+      "3": "Overcast",
+      "45": "Fog",
+      "48": "Rime fog",
+      "51": "Light drizzle",
+      "53": "Drizzle",
+      "55": "Heavy drizzle",
+      "56": "Light freezing drizzle",
+      "57": "Heavy freezing drizzle",
+      "61": "Light rain",
+      "63": "Rain",
+      "65": "Heavy rain",
+      "66": "Light freezing rain",
+      "67": "Heavy freezing rain",
+      "71": "Light snow",
+      "73": "Snow",
+      "75": "Heavy snow",
+      "77": "Snow grains",
+      "80": "Light rain showers",
+      "81": "Rain showers",
+      "82": "Heavy rain showers",
+      "85": "Light snow showers",
+      "86": "Heavy snow showers",
+      "95": "Thunderstorm",
+      "96": "Thunderstorm with hail",
+      "99": "Severe thunderstorm with hail"
     }
   },
   "errors": {
-    "fetchFailed": "Couldn't load the weather. Try again."
+    "fetchFailed": "Couldn't load the weather.",
+    "retry": "Try again",
+    "offlineHint": "Check your connection and try again."
   },
   "states": {
-    "offline": "You're offline"
+    "offline": "You're offline. Showing the latest cached data."
   },
   "liveRegion": {
-    "updated": "Weather for {{city}} updated"
+    "updated": "Weather for {{city}} updated",
+    "loading": "Loading weather for {{city}}",
+    "error": "Couldn't load weather for {{city}}"
   },
   "footer": {
-    "attribution": "Weather data by Open-Meteo"
+    "attribution": "Weather data by Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Free for non-commercial use under CC-BY 4.0"
   }
 }

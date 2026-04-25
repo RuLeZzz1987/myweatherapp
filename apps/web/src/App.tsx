@@ -1,58 +1,182 @@
-import { useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { AppHeader } from './components/AppHeader';
-import type { GeocodeResult } from './lib/api/types';
+import { AttributionFooter } from './components/AttributionFooter';
+import { CurrentWeatherHero } from './components/CurrentWeatherHero';
+import { RecentSearches, type RecentCardSnapshot } from './components/RecentSearches';
+import { useWeather } from './hooks/useWeather';
+import { selectionFromGeocode, useUrlSelection, type UrlSelection } from './hooks/useUrlSelection';
+import type { GeocodeResult, WeatherResponse } from './lib/api/types';
+import { usePrefs } from './store/prefs';
 
 /**
- * Step 6b shell — the wireframe's three zones are now in place:
+ * SPEC §5.6 primary view. Three regions:
  *   1. AppHeader (brand + units toggle + language picker + search)
- *   2. Hero (currently the empty state from SPEC §5.6 — "Search for a
- *      city to see the weather"; the real CurrentWeatherHero, the
- *      WeatherIllustration, and the Recent Searches strip land in §10
- *      step 7)
- *   3. AttributionFooter
+ *   2. Main: empty-state copy on first load → CurrentWeatherHero once
+ *      a city is selected
+ *   3. Recent-searches strip below the hero, with snapshots from the
+ *      TanStack Query cache so each card reflects the latest data
+ *      we've already seen for that city
+ *   4. AttributionFooter at the bottom
  *
- * Selecting a city from the SearchBar bubbles up here so we can show
- * the chosen name in the hero (proof that the wiring works end-to-end);
- * the actual `useWeather` query and rendering arrive in §10 step 7.
+ * The URL is the source of truth for the active selection so refresh /
+ * share-link survives. Selection updates also push the city onto the
+ * recent-searches list (capped 5, deduped by upstream id).
  */
+
 function App() {
-  const { t } = useTranslation();
-  const [selected, setSelected] = useState<GeocodeResult | null>(null);
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en';
+  const queryClient = useQueryClient();
+
+  const units = usePrefs((s) => s.units);
+  const recents = usePrefs((s) => s.recentSearches);
+  const pushRecentSearch = usePrefs((s) => s.pushRecentSearch);
+  const removeRecentSearch = usePrefs((s) => s.removeRecentSearch);
+
+  const { selection, setSelection } = useUrlSelection();
+
+  const weatherQuery = useWeather(
+    selection
+      ? {
+          lat: selection.lat,
+          lon: selection.lon,
+          ...(selection.name ? { name: selection.name } : {}),
+          ...(selection.country ? { country: selection.country } : {}),
+        }
+      : null,
+    units,
+  );
+
+  // When a deep-linked selection (URL only carries lat/lon/name) lands
+  // its first weather payload, promote it onto the recents strip so a
+  // shared link backfills the card. We don't bump position on every
+  // refetch — the explicit selection handlers below own ordering.
+  const weatherDataRef = weatherQuery.data;
+  useEffect(() => {
+    if (!selection || !weatherDataRef) return;
+    if (recents.some((r) => r.id === selection.id)) return;
+    const fromSelection = inferGeocodeFromSelectionAndWeather(selection, weatherDataRef);
+    if (!fromSelection) return;
+    pushRecentSearch(fromSelection);
+  }, [selection, weatherDataRef, recents, pushRecentSearch]);
+
+  function handleCitySelect(result: GeocodeResult) {
+    pushRecentSearch(result);
+    setSelection(selectionFromGeocode(result), { push: true });
+  }
+
+  function handleRecentSelect(geocode: GeocodeResult) {
+    pushRecentSearch(geocode);
+    setSelection(selectionFromGeocode(geocode), { push: true });
+  }
+
+  // Read each recent city's last-seen weather from the TanStack Query
+  // cache so the strip shows live numbers instead of placeholders. We
+  // never fetch on its behalf — that would multiply network requests
+  // every time `recents` re-orders. `dataUpdatedAt` is included as a
+  // "tick" so when a refetch lands the memo runs again and the active
+  // card picks up the new temperature.
+  const dataTick = weatherQuery.dataUpdatedAt;
+  const recentCards = useMemo<RecentCardSnapshot[]>(() => {
+    void dataTick;
+    return recents.map((g) => {
+      const cached = queryClient.getQueryData<WeatherResponse>([
+        'weather',
+        g.latitude.toFixed(4),
+        g.longitude.toFixed(4),
+        units,
+      ]);
+      return {
+        geocode: g,
+        ...(cached
+          ? {
+              temperature: cached.current.temperature,
+              weatherCode: cached.current.weatherCode,
+              isDay: cached.current.isDay,
+            }
+          : {}),
+      };
+    });
+  }, [recents, units, queryClient, dataTick]);
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-5xl flex-col gap-12 px-6 py-6">
-      <AppHeader onCitySelect={setSelected} />
+    <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-surface-strong focus:px-3 focus:py-2 focus:text-sm focus:text-text"
+      >
+        {t('app.skipToContent')}
+      </a>
 
-      <section className="flex flex-1 flex-col items-center justify-center text-center">
-        {selected ? (
-          <>
-            <h2 className="text-3xl font-light">{selected.name}</h2>
-            <p className="mt-2 text-muted">
-              {selected.country}
-              {selected.admin1 ? ` · ${selected.admin1}` : ''}
-            </p>
-            <p className="mt-8 text-sm text-muted">
-              {/* Hero comes online in §10 step 7 — for now just confirm the
-                  selection round-tripped. */}
-              {t('app.tagline')}
-            </p>
-          </>
-        ) : (
-          <>
-            <h2 className="text-2xl">{t('app.greeting')}</h2>
-            <p className="mt-2 text-muted">{t('app.tagline')}</p>
-            <p className="mt-8 text-muted">{t('empty.prompt')}</p>
-          </>
-        )}
-      </section>
+      <main
+        id="main"
+        aria-label={t('app.main')}
+        className="mx-auto flex min-h-svh max-w-5xl flex-col gap-8 px-6 py-6"
+      >
+        <AppHeader onCitySelect={handleCitySelect} />
 
-      <footer className="text-center text-xs text-muted">
-        <small>{t('footer.attribution')}</small>
-      </footer>
-    </main>
+        <section className="flex flex-1 flex-col gap-8">
+          {weatherQuery.data ? (
+            <CurrentWeatherHero
+              weather={weatherQuery.data}
+              locale={locale}
+              preferredUnits={units}
+            />
+          ) : selection ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="rounded-3xl border border-border bg-surface px-6 py-16 text-center text-muted"
+            >
+              {t('hero.loading')}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface px-6 py-20 text-center">
+              <h2 className="text-2xl font-light">{t('empty.title')}</h2>
+              <p className="max-w-md text-muted">{t('empty.prompt')}</p>
+            </div>
+          )}
+
+          <RecentSearches
+            cards={recentCards}
+            units={units}
+            locale={locale}
+            activeId={selection?.id ?? null}
+            onSelect={handleRecentSelect}
+            onRemove={removeRecentSearch}
+          />
+        </section>
+
+        <AttributionFooter />
+      </main>
+    </>
   );
+}
+
+/**
+ * URL deep-links may carry less than a full GeocodeResult (someone
+ * shared `/?lat=…&lon=…` only). Once the weather payload lands we can
+ * synthesize a record good enough to live on the recents strip.
+ */
+function inferGeocodeFromSelectionAndWeather(
+  selection: UrlSelection,
+  weather: WeatherResponse,
+): GeocodeResult | null {
+  const id =
+    selection.id ??
+    `${weather.location.latitude.toFixed(4)}:${weather.location.longitude.toFixed(4)}`;
+  return {
+    id,
+    name: selection.name || weather.location.name || '',
+    country: selection.country || weather.location.country || '',
+    countryCode: selection.countryCode ?? '',
+    latitude: weather.location.latitude,
+    longitude: weather.location.longitude,
+    timezone: selection.timezone ?? weather.location.timezone,
+  };
 }
 
 export default App;
