@@ -75,7 +75,7 @@ export function SecondaryStats({ weather, units, locale }: SecondaryStatsProps) 
     rows.push({
       key: 'precipProb',
       label: t('stats.precipitationProbability'),
-      value: t('stats.humidityValue', {
+      value: t('stats.precipitationProbabilityValue', {
         value: roundInt(weather.current.precipitationProbability),
       }),
     });
@@ -105,10 +105,13 @@ export function SecondaryStats({ weather, units, locale }: SecondaryStatsProps) 
   // Show feels-like as the very first row even though it's a hero
   // copy too — the stats grid is usable on its own (e.g. screen
   // reader walks the dl directly) and "Feels like" is the most
-  // user-meaningful number after current temp.
+  // user-meaningful number after current temp. We use the dedicated
+  // `stats.feelsLike` key (a noun phrase) instead of `stats.title`,
+  // which is the section heading — otherwise screen readers would
+  // announce "Conditions — Conditions: 15°C".
   rows.unshift({
     key: 'feelsLike',
-    label: t('stats.title'),
+    label: t('stats.feelsLike'),
     value: formatTemperature(weather.current.apparentTemperature, weather.units, locale),
   });
 

@@ -45,6 +45,7 @@
   },
   "stats": {
     "title": "Condições",
+    "feelsLike": "Sensação térmica",
     "humidity": "Humidade",
     "humidityValue": "{{value}} %",
     "wind": "Vento",
@@ -59,6 +60,7 @@
     "precipitation": "Precipitação",
     "precipitationValue": "{{value}} {{unit}}",
     "precipitationProbability": "Probabilidade de chuva",
+    "precipitationProbabilityValue": "{{value}} %",
     "windDir": {
       "N": "N",
       "NE": "NE",

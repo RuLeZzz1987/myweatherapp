@@ -60,24 +60,35 @@ function readUrl(): UrlSelection | null {
   return { id, lat, lon, name, country, countryCode };
 }
 
-function writeUrl(s: UrlSelection | null): void {
-  if (typeof window === 'undefined') return;
-  const url = new URL(window.location.href);
-  const KEYS = ['id', 'lat', 'lon', 'name', 'country', 'cc'] as const;
-  for (const k of KEYS) url.searchParams.delete(k);
+/** All search-param keys this hook owns; cleared in `applyToUrl` first. */
+const URL_KEYS = ['id', 'lat', 'lon', 'name', 'country', 'cc'] as const;
 
-  if (s) {
-    if (s.id) url.searchParams.set('id', s.id);
-    url.searchParams.set('lat', s.lat.toFixed(4));
-    url.searchParams.set('lon', s.lon.toFixed(4));
-    if (s.name) url.searchParams.set('name', s.name);
-    if (s.country) url.searchParams.set('country', s.country);
-    if (s.countryCode) url.searchParams.set('cc', s.countryCode);
-  }
-  // replaceState — we don't want every click to push a history entry that
-  // leaves a "back to no-selection" stop. We use pushState only when the
-  // caller explicitly asks (via setSelection's `push` arg).
-  window.history.replaceState(window.history.state, '', url.toString());
+/**
+ * Mutate `url`'s search params to reflect `s`. Removes every key this
+ * hook owns first so going from a populated selection to `null` clears
+ * everything. Caller decides whether to commit via push/replaceState.
+ */
+function applyToUrl(url: URL, s: UrlSelection | null): void {
+  for (const k of URL_KEYS) url.searchParams.delete(k);
+  if (!s) return;
+  if (s.id) url.searchParams.set('id', s.id);
+  url.searchParams.set('lat', s.lat.toFixed(4));
+  url.searchParams.set('lon', s.lon.toFixed(4));
+  if (s.name) url.searchParams.set('name', s.name);
+  if (s.country) url.searchParams.set('country', s.country);
+  if (s.countryCode) url.searchParams.set('cc', s.countryCode);
+}
+
+/**
+ * Build the next URL string for `s`, preserving any unrelated params
+ * already on the page (e.g. `?lang=de`). Returns `null` in non-browser
+ * contexts (SSR/test harness) so the caller can short-circuit.
+ */
+function nextUrlFor(s: UrlSelection | null): string | null {
+  if (typeof window === 'undefined') return null;
+  const url = new URL(window.location.href);
+  applyToUrl(url, s);
+  return url.toString();
 }
 
 export interface UseUrlSelectionResult {
@@ -100,22 +111,17 @@ export function useUrlSelection(): UseUrlSelectionResult {
 
   const setSelection = useCallback((s: UrlSelection | null, opts?: { push?: boolean }) => {
     setLocal(s);
-    if (opts?.push && typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      const KEYS = ['id', 'lat', 'lon', 'name', 'country', 'cc'] as const;
-      for (const k of KEYS) url.searchParams.delete(k);
-      if (s) {
-        if (s.id) url.searchParams.set('id', s.id);
-        url.searchParams.set('lat', s.lat.toFixed(4));
-        url.searchParams.set('lon', s.lon.toFixed(4));
-        if (s.name) url.searchParams.set('name', s.name);
-        if (s.country) url.searchParams.set('country', s.country);
-        if (s.countryCode) url.searchParams.set('cc', s.countryCode);
-      }
-      window.history.pushState(null, '', url.toString());
-      return;
+    const next = nextUrlFor(s);
+    if (next === null) return;
+    // pushState leaves a back-stop; we only do that when an explicit
+    // user action (recent-card click, search-result click) wants the
+    // browser back button to walk the selection history. Otherwise
+    // replaceState keeps the URL fresh without polluting history.
+    if (opts?.push) {
+      window.history.pushState(null, '', next);
+    } else {
+      window.history.replaceState(window.history.state, '', next);
     }
-    writeUrl(s);
   }, []);
 
   return { selection, setSelection };

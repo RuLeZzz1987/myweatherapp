@@ -31,7 +31,9 @@
 
   --color-weather-clear: #fbe6a8;
   --color-weather-cloud: #c5c8d2;
+  --color-weather-fog: #b4b9c4;
   --color-weather-rain: #6b7480;
+  --color-weather-storm: #4a4f5e;
   --color-weather-snow: #e9eef5;
   --color-weather-night: #2a2f40;
 
@@ -48,6 +50,14 @@
     --color-text: #f3f4f6;
     --color-muted: #9ca3af;
     --color-border: #2e303a;
+
+    /* Weather palette darkens to keep readable contrast on dark mode. */
+    --color-weather-clear: #6b5d2a;
+    --color-weather-cloud: #3b4150;
+    --color-weather-fog: #313644;
+    --color-weather-rain: #2d3340;
+    --color-weather-storm: #1f2330;
+    --color-weather-snow: #4b5060;
   }
 }
 

@@ -45,6 +45,7 @@
   },
   "stats": {
     "title": "Omstandigheden",
+    "feelsLike": "Gevoelstemperatuur",
     "humidity": "Luchtvochtigheid",
     "humidityValue": "{{value}} %",
     "wind": "Wind",
@@ -59,6 +60,7 @@
     "precipitation": "Neerslag",
     "precipitationValue": "{{value}} {{unit}}",
     "precipitationProbability": "Kans op regen",
+    "precipitationProbabilityValue": "{{value}} %",
     "windDir": {
       "N": "N",
       "NE": "NO",

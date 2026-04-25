@@ -101,6 +101,22 @@ describe('<SecondaryStats />', () => {
     expect(screen.getByText('4')).toBeInTheDocument();
   });
 
+  it('uses a distinct "Feels like" label, not the section heading', () => {
+    renderWithProviders(<SecondaryStats weather={buildWeather()} units="metric" locale="en" />);
+    // The <h2> says "Conditions"; the feels-like row should NOT also
+    // be labelled "Conditions" (otherwise screen readers say
+    // "Conditions — Conditions: 6°C").
+    expect(screen.getByRole('heading', { level: 2, name: 'Conditions' })).toBeInTheDocument();
+    expect(screen.getByText('Feels like')).toBeInTheDocument();
+  });
+
+  it('renders precipitation probability via its own translation key', () => {
+    renderWithProviders(<SecondaryStats weather={buildWeather()} units="metric" locale="en" />);
+    // Two distinct percent values: humidity 64% and precip prob 20%.
+    expect(screen.getByText('64%')).toBeInTheDocument();
+    expect(screen.getByText('20%')).toBeInTheDocument();
+  });
+
   it('shows precipitation probability only when present', () => {
     const a = buildWeather();
     renderWithProviders(<SecondaryStats weather={a} units="metric" locale="en" />);

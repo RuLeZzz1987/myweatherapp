@@ -104,18 +104,35 @@ export const usePrefs = create<PrefsState>()(
       name: STORAGE_KEY,
       version: STORAGE_VERSION,
       storage: createJSONStorage(() => localStorage),
-      // Older versions of the slice didn't carry recentSearches; pass them
-      // through and let `merge` recoerce — failing to migrate would
-      // silently clear users' prefs on a routine deploy.
-      migrate: (persisted: unknown) => persisted as Partial<PrefsState>,
+      // Migration policy: every shape concern (per-field type validation,
+      // unsupported-locale culling, recents dedup/cap) is enforced in
+      // `merge` below, which runs on *every* rehydrate regardless of
+      // version. So `migrate` only has to bridge intentional schema
+      // breaks. Today we only need to forward the persisted blob —
+      // `merge` then sanitizes it. When we make a *real* breaking change
+      // (e.g. rename a field) we bump STORAGE_VERSION and add an explicit
+      // case here.
+      migrate: (persisted, fromVersion) => {
+        if (typeof persisted !== 'object' || persisted === null) return {};
+        // No breaking changes between v1 and v2 — recentSearches was
+        // introduced as an optional field, which `merge` already
+        // handles via `Array.isArray`. So the historical migration is a
+        // pass-through. Keep this branch explicit so the next breaking
+        // change has an obvious place to land.
+        if (fromVersion < STORAGE_VERSION) {
+          return persisted as Partial<PrefsState>;
+        }
+        return persisted as Partial<PrefsState>;
+      },
       partialize: (s) => ({
         units: s.units,
         languageOverride: s.languageOverride,
         recentSearches: s.recentSearches,
       }),
-      // Validate everything on rehydrate — the persisted shape can drift
-      // (we removed a locale, the GeocodeResult shape evolved, etc.) and
-      // we'd rather fall back to defaults than throw.
+      // Validate every field on rehydrate — the persisted shape can drift
+      // (a locale we used to support gets removed, the GeocodeResult
+      // shape evolves, a user manually edits localStorage) and we'd
+      // rather fall back to defaults than throw mid-render.
       merge: (persisted, current) => {
         const incoming = (persisted ?? {}) as Partial<PrefsState>;
         const safeLang =

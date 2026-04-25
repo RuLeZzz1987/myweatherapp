@@ -24,10 +24,10 @@ export interface ThemeBackdropProps {
 const PALETTE_TOKEN: Record<WmoPalette, string> = {
   clear: 'var(--color-weather-clear)',
   cloud: 'var(--color-weather-cloud)',
-  fog: 'var(--color-weather-cloud)',
+  fog: 'var(--color-weather-fog)',
   rain: 'var(--color-weather-rain)',
   snow: 'var(--color-weather-snow)',
-  storm: 'var(--color-weather-rain)',
+  storm: 'var(--color-weather-storm)',
 };
 
 export function ThemeBackdrop({

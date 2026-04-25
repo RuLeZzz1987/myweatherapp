@@ -45,8 +45,16 @@ jobs:
       - name: i18n catalog check
         run: pnpm i18n:check
 
-      - name: Test
-        run: pnpm test
+      - name: Test (api)
+        run: pnpm --filter @myweather/api run test
+
+      - name: Test with coverage (web)
+        # Coverage gate enforces SPEC §7 (≥80% statements). The api
+        # package isn't gated here — @cloudflare/vitest-pool-workers
+        # runs tests in workerd, where v8 coverage instrumentation is
+        # not exposed to the host vitest. Re-evaluate once cloudflare
+        # ships first-class coverage support.
+        run: pnpm --filter @myweather/web run test:coverage
 
       - name: Build
         run: pnpm build
