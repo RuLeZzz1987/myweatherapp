@@ -22,7 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
+      # Corepack ships with Node 22 and activates pnpm from the
+      # `packageManager` field in package.json. This removes the
+      # `pnpm/action-setup@v4` dependency, which is pinned to Node 20
+      # (deprecated by GitHub Actions, removal Sep 2026).
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v5
@@ -68,7 +73,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Setup Node ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v5
