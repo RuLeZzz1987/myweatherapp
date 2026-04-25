@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+coverage
+.wrangler
+.cache
+pnpm-lock.yaml
+*.min.js
+*.min.css
+
+# Keep the original brief untouched.
+requirements.md
