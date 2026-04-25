@@ -14,14 +14,17 @@
     "i18n:check": "node scripts/i18n-check.mjs"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.100.3",
     "i18next": "26.0.8",
     "i18next-browser-languagedetector": "8.2.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-i18next": "17.0.4"
+    "react-i18next": "17.0.4",
+    "zustand": "5.0.12"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "4.2.4",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
     "@testing-library/user-event": "14.6.1",
@@ -35,6 +38,8 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
     "jsdom": "29.0.2",
+    "msw": "2.13.6",
+    "tailwindcss": "4.2.4",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10",

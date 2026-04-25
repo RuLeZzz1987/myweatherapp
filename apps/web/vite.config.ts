@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 /**
  * MyWeather frontend — see SPEC.md §4.6.
@@ -11,7 +12,7 @@ import react from '@vitejs/plugin-react';
  * Run both with `pnpm dev` from the repo root.
  */
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
     strictPort: true,
