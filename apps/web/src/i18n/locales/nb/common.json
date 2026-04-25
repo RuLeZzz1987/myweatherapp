@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Hopp til hovedinnhold",
+    "main": "Vær"
+  },
+  "header": {
+    "searchLabel": "Søk etter en by",
+    "searchPlaceholder": "Søk etter en by",
+    "languageLabel": "Språk",
+    "unitsLabel": "Enheter",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Ingen treff",
+    "loading": "Søker…",
+    "error": "Kunne ikke søke. Prøv igjen.",
+    "clear": "Tøm søk"
+  },
+  "empty": {
+    "title": "Finn været, hvor som helst.",
+    "prompt": "Søk etter en by for å se nåværende forhold og uken som kommer.",
+    "useLocation": "Bruk min posisjon"
+  },
+  "recents": {
+    "title": "Nylige søk",
+    "cardLabel": "Vis været for {{city}}, nå {{temp}}",
+    "remove": "Fjern {{city}} fra nylige søk",
+    "clearAll": "Tøm alle"
+  },
+  "hero": {
+    "loading": "Laster vær…",
+    "labelTemperature": "Nåværende temperatur",
+    "labelCondition": "Nåværende forhold",
+    "feelsLike": "Føles som {{temp}}",
+    "asOf": "Per {{time}}",
+    "cached": "Bufret {{ago}}",
+    "stale": "Viser bufrede data – kilden er utilgjengelig",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Forhold",
+    "humidity": "Luftfuktighet",
+    "humidityValue": "{{value}} %",
+    "wind": "Vind",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Trykk",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Skydekke",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "UV-indeks",
+    "sunrise": "Soloppgang",
+    "sunset": "Solnedgang",
+    "precipitation": "Nedbør",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Sjanse for regn",
+    "windDir": {
+      "N": "N",
+      "NE": "NØ",
+      "E": "Ø",
+      "SE": "SØ",
+      "S": "S",
+      "SW": "SV",
+      "W": "V",
+      "NW": "NV"
+    },
+    "unit": {
+      "kmh": "km/t",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "tommer"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Neste 24 timer",
+    "dailyTitle": "Neste 7 dager",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: høy {{high}}, lav {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Klart vær",
+      "1": "Mest klart",
+      "2": "Delvis skyet",
+      "3": "Overskyet",
+      "45": "Tåke",
+      "48": "Rimtåke",
+      "51": "Lett yr",
+      "53": "Yr",
+      "55": "Kraftig yr",
+      "56": "Lett underkjølt yr",
+      "57": "Kraftig underkjølt yr",
+      "61": "Lett regn",
+      "63": "Regn",
+      "65": "Kraftig regn",
+      "66": "Lett underkjølt regn",
+      "67": "Kraftig underkjølt regn",
+      "71": "Lett snø",
+      "73": "Snø",
+      "75": "Kraftig snø",
+      "77": "Snøkorn",
+      "80": "Lette regnbyger",
+      "81": "Regnbyger",
+      "82": "Kraftige regnbyger",
+      "85": "Lette snøbyger",
+      "86": "Kraftige snøbyger",
+      "95": "Tordenvær",
+      "96": "Tordenvær med hagl",
+      "99": "Kraftig tordenvær med hagl"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Kunne ikke laste været.",
+    "retry": "Prøv igjen",
+    "offlineHint": "Sjekk tilkoblingen din og prøv igjen."
+  },
+  "states": {
+    "offline": "Du er frakoblet. Viser de siste bufrede dataene."
+  },
+  "liveRegion": {
+    "updated": "Vær for {{city}} oppdatert",
+    "loading": "Laster vær for {{city}}",
+    "error": "Kunne ikke laste vær for {{city}}"
+  },
+  "footer": {
+    "attribution": "Værdata fra Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Gratis til ikke-kommersiell bruk under CC-BY 4.0"
+  }
+}

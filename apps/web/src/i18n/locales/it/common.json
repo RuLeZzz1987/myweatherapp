@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Vai al contenuto principale",
+    "main": "Meteo"
+  },
+  "header": {
+    "searchLabel": "Cerca una città",
+    "searchPlaceholder": "Cerca una città",
+    "languageLabel": "Lingua",
+    "unitsLabel": "Unità",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Nessun risultato",
+    "loading": "Ricerca in corso…",
+    "error": "Ricerca non riuscita. Riprova.",
+    "clear": "Cancella ricerca"
+  },
+  "empty": {
+    "title": "Trova il meteo, ovunque.",
+    "prompt": "Cerca una città per vedere le condizioni attuali e la settimana a venire.",
+    "useLocation": "Usa la mia posizione"
+  },
+  "recents": {
+    "title": "Ricerche recenti",
+    "cardLabel": "Mostra il meteo per {{city}}, attualmente {{temp}}",
+    "remove": "Rimuovi {{city}} dalle ricerche recenti",
+    "clearAll": "Cancella tutto"
+  },
+  "hero": {
+    "loading": "Caricamento meteo…",
+    "labelTemperature": "Temperatura attuale",
+    "labelCondition": "Condizione attuale",
+    "feelsLike": "Percepita {{temp}}",
+    "asOf": "Alle {{time}}",
+    "cached": "In cache da {{ago}}",
+    "stale": "Mostro dati in cache — sorgente non disponibile",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Condizioni",
+    "humidity": "Umidità",
+    "humidityValue": "{{value}} %",
+    "wind": "Vento",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Pressione",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Copertura nuvolosa",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "Indice UV",
+    "sunrise": "Alba",
+    "sunset": "Tramonto",
+    "precipitation": "Precipitazioni",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Probabilità di pioggia",
+    "windDir": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SO",
+      "W": "O",
+      "NW": "NO"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "poll"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Prossime 24 ore",
+    "dailyTitle": "Prossimi 7 giorni",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: max {{high}}, min {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Cielo sereno",
+      "1": "Prevalentemente sereno",
+      "2": "Parzialmente nuvoloso",
+      "3": "Coperto",
+      "45": "Nebbia",
+      "48": "Nebbia gelata",
+      "51": "Pioviggine leggera",
+      "53": "Pioviggine",
+      "55": "Pioviggine intensa",
+      "56": "Pioviggine gelata leggera",
+      "57": "Pioviggine gelata intensa",
+      "61": "Pioggia leggera",
+      "63": "Pioggia",
+      "65": "Pioggia intensa",
+      "66": "Pioggia gelata leggera",
+      "67": "Pioggia gelata intensa",
+      "71": "Neve leggera",
+      "73": "Neve",
+      "75": "Neve intensa",
+      "77": "Granuli di neve",
+      "80": "Rovesci leggeri",
+      "81": "Rovesci",
+      "82": "Rovesci forti",
+      "85": "Nevicate leggere",
+      "86": "Nevicate forti",
+      "95": "Temporale",
+      "96": "Temporale con grandine",
+      "99": "Forte temporale con grandine"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Impossibile caricare il meteo.",
+    "retry": "Riprova",
+    "offlineHint": "Controlla la connessione e riprova."
+  },
+  "states": {
+    "offline": "Sei offline. Mostro gli ultimi dati in cache."
+  },
+  "liveRegion": {
+    "updated": "Meteo per {{city}} aggiornato",
+    "loading": "Caricamento meteo per {{city}}",
+    "error": "Impossibile caricare il meteo per {{city}}"
+  },
+  "footer": {
+    "attribution": "Dati meteo da Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Gratis per uso non commerciale sotto CC-BY 4.0"
+  }
+}

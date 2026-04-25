@@ -139,8 +139,11 @@ describe('<App />', () => {
 
       renderWithProviders(<App />);
 
-      // Loading status is announced before the request resolves.
-      expect(screen.getByRole('status')).toHaveTextContent(/Loading weather/i);
+      // Loading status is announced before the request resolves; multiple
+      // status nodes exist (skeleton + live region), at least one announces
+      // the localized "Loading weather…" string.
+      const statuses = screen.getAllByRole('status');
+      expect(statuses.some((node) => /Loading weather/i.test(node.textContent ?? ''))).toBe(true);
 
       // Then the hero renders.
       expect(await screen.findByRole('heading', { level: 2, name: 'Oslo' })).toBeInTheDocument();

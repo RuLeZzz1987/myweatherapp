@@ -6,9 +6,15 @@ import { AppHeader } from './components/AppHeader';
 import { AttributionFooter } from './components/AttributionFooter';
 import { CurrentWeatherHero } from './components/CurrentWeatherHero';
 import { DailyForecast } from './components/DailyForecast';
+import { EmptyState } from './components/EmptyState';
+import { ErrorState } from './components/ErrorState';
 import { HourlyForecast } from './components/HourlyForecast';
+import { LiveRegion } from './components/LiveRegion';
+import { OfflineBanner } from './components/OfflineBanner';
 import { RecentSearches, type RecentCardSnapshot } from './components/RecentSearches';
 import { SecondaryStats } from './components/SecondaryStats';
+import { WeatherSkeleton } from './components/WeatherSkeleton';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useWeather } from './hooks/useWeather';
 import { selectionFromGeocode, useUrlSelection, type UrlSelection } from './hooks/useUrlSelection';
 import type { GeocodeResult, WeatherResponse } from './lib/api/types';
@@ -40,6 +46,7 @@ function App() {
   const removeRecentSearch = usePrefs((s) => s.removeRecentSearch);
 
   const { selection, setSelection } = useUrlSelection();
+  const online = useOnlineStatus();
 
   const weatherQuery = useWeather(
     selection
@@ -105,6 +112,17 @@ function App() {
     });
   }, [recents, units, queryClient, dataTick]);
 
+  const cityLabel = useMemo(() => {
+    if (weatherQuery.data) {
+      const { name, country } = weatherQuery.data.location;
+      return country ? `${name}, ${country}` : name;
+    }
+    if (selection) {
+      return selection.country ? `${selection.name}, ${selection.country}` : selection.name || null;
+    }
+    return null;
+  }, [weatherQuery.data, selection]);
+
   return (
     <>
       <a
@@ -121,6 +139,14 @@ function App() {
       >
         <AppHeader onCitySelect={handleCitySelect} />
 
+        <OfflineBanner online={online} />
+
+        <LiveRegion
+          cityLabel={cityLabel}
+          status={liveRegionStatus(weatherQuery)}
+          tick={weatherQuery.dataUpdatedAt}
+        />
+
         <section className="flex flex-1 flex-col gap-8">
           {weatherQuery.data ? (
             <>
@@ -133,19 +159,19 @@ function App() {
               <HourlyForecast weather={weatherQuery.data} units={units} locale={locale} />
               <DailyForecast weather={weatherQuery.data} units={units} locale={locale} />
             </>
+          ) : selection && weatherQuery.isError ? (
+            <ErrorState
+              error={weatherQuery.error}
+              online={online}
+              cityLabel={cityLabel ?? undefined}
+              onRetry={() => {
+                void weatherQuery.refetch();
+              }}
+            />
           ) : selection ? (
-            <div
-              role="status"
-              aria-live="polite"
-              className="rounded-3xl border border-border bg-surface px-6 py-16 text-center text-muted"
-            >
-              {t('hero.loading')}
-            </div>
+            <WeatherSkeleton cityLabel={cityLabel ?? undefined} />
           ) : (
-            <div className="flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface px-6 py-20 text-center">
-              <h2 className="text-2xl font-light">{t('empty.title')}</h2>
-              <p className="max-w-md text-muted">{t('empty.prompt')}</p>
-            </div>
+            <EmptyState />
           )}
 
           <RecentSearches
@@ -162,6 +188,15 @@ function App() {
       </main>
     </>
   );
+}
+
+function liveRegionStatus(
+  query: ReturnType<typeof useWeather>,
+): 'idle' | 'loading' | 'success' | 'error' {
+  if (query.isError) return 'error';
+  if (query.isFetching && !query.data) return 'loading';
+  if (query.data) return 'success';
+  return 'idle';
 }
 
 /**

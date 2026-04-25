@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Saltar al contenido principal",
+    "main": "Tiempo"
+  },
+  "header": {
+    "searchLabel": "Buscar una ciudad",
+    "searchPlaceholder": "Buscar una ciudad",
+    "languageLabel": "Idioma",
+    "unitsLabel": "Unidades",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Sin resultados",
+    "loading": "Buscando…",
+    "error": "No se pudo buscar. Inténtalo de nuevo.",
+    "clear": "Borrar búsqueda"
+  },
+  "empty": {
+    "title": "Encuentra el tiempo, en cualquier lugar.",
+    "prompt": "Busca una ciudad para ver las condiciones actuales y la próxima semana.",
+    "useLocation": "Usar mi ubicación"
+  },
+  "recents": {
+    "title": "Búsquedas recientes",
+    "cardLabel": "Ver el tiempo de {{city}}, actualmente {{temp}}",
+    "remove": "Quitar {{city}} de las búsquedas recientes",
+    "clearAll": "Borrar todo"
+  },
+  "hero": {
+    "loading": "Cargando el tiempo…",
+    "labelTemperature": "Temperatura actual",
+    "labelCondition": "Condición actual",
+    "feelsLike": "Sensación {{temp}}",
+    "asOf": "A las {{time}}",
+    "cached": "En caché desde hace {{ago}}",
+    "stale": "Mostrando datos en caché — fuente no disponible",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Condiciones",
+    "humidity": "Humedad",
+    "humidityValue": "{{value}} %",
+    "wind": "Viento",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Presión",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Nubosidad",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "Índice UV",
+    "sunrise": "Amanecer",
+    "sunset": "Atardecer",
+    "precipitation": "Precipitación",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Probabilidad de lluvia",
+    "windDir": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SO",
+      "W": "O",
+      "NW": "NO"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "pulg"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Próximas 24 horas",
+    "dailyTitle": "Próximos 7 días",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: máx {{high}}, mín {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Cielo despejado",
+      "1": "Mayormente despejado",
+      "2": "Parcialmente nublado",
+      "3": "Cubierto",
+      "45": "Niebla",
+      "48": "Niebla con escarcha",
+      "51": "Llovizna ligera",
+      "53": "Llovizna",
+      "55": "Llovizna intensa",
+      "56": "Llovizna engelante ligera",
+      "57": "Llovizna engelante intensa",
+      "61": "Lluvia ligera",
+      "63": "Lluvia",
+      "65": "Lluvia intensa",
+      "66": "Lluvia engelante ligera",
+      "67": "Lluvia engelante intensa",
+      "71": "Nieve ligera",
+      "73": "Nieve",
+      "75": "Nieve intensa",
+      "77": "Granos de nieve",
+      "80": "Chubascos ligeros",
+      "81": "Chubascos",
+      "82": "Chubascos fuertes",
+      "85": "Nevadas ligeras",
+      "86": "Nevadas fuertes",
+      "95": "Tormenta",
+      "96": "Tormenta con granizo",
+      "99": "Tormenta severa con granizo"
+    }
+  },
+  "errors": {
+    "fetchFailed": "No se pudo cargar el tiempo.",
+    "retry": "Reintentar",
+    "offlineHint": "Comprueba tu conexión e inténtalo de nuevo."
+  },
+  "states": {
+    "offline": "Estás sin conexión. Mostrando los últimos datos en caché."
+  },
+  "liveRegion": {
+    "updated": "Tiempo para {{city}} actualizado",
+    "loading": "Cargando el tiempo para {{city}}",
+    "error": "No se pudo cargar el tiempo para {{city}}"
+  },
+  "footer": {
+    "attribution": "Datos meteorológicos de Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Gratis para uso no comercial bajo CC-BY 4.0"
+  }
+}

@@ -23,14 +23,54 @@ const localesRoot = resolve(import.meta.dirname, '..', 'src', 'i18n', 'locales')
 /**
  * Keys whose values are EXPECTED to match English across locales. Anything
  * outside this list that matches `en` flags as a likely missed translation.
+ *
+ * Mostly formatting / glyph keys (unit symbols, compass cardinals that
+ * happen to share letters across locales, and the Open-Meteo attribution
+ * URL).
  */
-const ALLOW_SAME_AS_SOURCE = new Set(['brand', 'header.unit.metric', 'header.unit.imperial']);
+const ALLOW_SAME_AS_SOURCE = new Set([
+  'brand',
+  'common.brand',
+  // Cognates that legitimately match across languages.
+  'common.stats.wind', // de, nl: "Wind"
+  'common.stats.title', // fr: "Conditions"
+  'common.header.unit.metric',
+  'common.header.unit.imperial',
+  'common.stats.unit.kmh',
+  'common.stats.unit.mph',
+  'common.stats.unit.mm',
+  'common.stats.windDir.N',
+  'common.stats.windDir.NE',
+  'common.stats.windDir.E',
+  'common.stats.windDir.SE',
+  'common.stats.windDir.S',
+  'common.stats.windDir.SW',
+  'common.stats.windDir.W',
+  'common.stats.windDir.NW',
+  'common.footer.attributionLink',
+  'footer.attributionLink',
+]);
 
 /**
  * If the en value is one of these "tokens", we assume it doesn't need
  * translating either way (e.g. brand mentions inside larger keys).
  */
 const SHARED_TOKENS = new Set(['MyWeather', 'Open-Meteo', 'CLDR']);
+
+/**
+ * Strings made up entirely of formatting tokens / punctuation /
+ * interpolation slots are language-agnostic by definition. We strip
+ * `{{placeholder}}` segments and a small set of unit glyphs (hPa, mph,
+ * mm, km/h, °C, °F) before checking — anything left without a Unicode
+ * letter is considered a format string and skipped by the heuristic.
+ */
+const PLACEHOLDER_RE = /\{\{[^}]+\}\}/g;
+const UNIT_GLYPHS_RE = /(hPa|mph|km\/h|km\/u|km\/t|mm|°C|°F|po|pol|tum|cale|tuumaa)/gi;
+
+function isFormatOnly(value) {
+  const stripped = value.replace(PLACEHOLDER_RE, '').replace(UNIT_GLYPHS_RE, '');
+  return !/\p{L}/u.test(stripped);
+}
 
 const STRICT = process.argv.includes('--strict') || process.env.CI === 'true';
 
@@ -107,6 +147,7 @@ for (const lang of otherLangs) {
     if (value !== sourceValue) continue;
     if (ALLOW_SAME_AS_SOURCE.has(key)) continue;
     if (SHARED_TOKENS.has(value)) continue;
+    if (isFormatOnly(value)) continue;
     untranslated.push(`${key} = ${JSON.stringify(value)}`);
   }
 

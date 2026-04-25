@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Saltar para o conteúdo principal",
+    "main": "Tempo"
+  },
+  "header": {
+    "searchLabel": "Procurar uma cidade",
+    "searchPlaceholder": "Procurar uma cidade",
+    "languageLabel": "Idioma",
+    "unitsLabel": "Unidades",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Sem resultados",
+    "loading": "A pesquisar…",
+    "error": "Não foi possível pesquisar. Tente novamente.",
+    "clear": "Limpar pesquisa"
+  },
+  "empty": {
+    "title": "Encontre o tempo, em qualquer lugar.",
+    "prompt": "Procure uma cidade para ver as condições atuais e a próxima semana.",
+    "useLocation": "Usar a minha localização"
+  },
+  "recents": {
+    "title": "Pesquisas recentes",
+    "cardLabel": "Ver tempo para {{city}}, atualmente {{temp}}",
+    "remove": "Remover {{city}} das pesquisas recentes",
+    "clearAll": "Limpar tudo"
+  },
+  "hero": {
+    "loading": "A carregar tempo…",
+    "labelTemperature": "Temperatura atual",
+    "labelCondition": "Condição atual",
+    "feelsLike": "Sensação de {{temp}}",
+    "asOf": "Atualizado às {{time}}",
+    "cached": "Em cache há {{ago}}",
+    "stale": "A mostrar dados em cache — origem indisponível",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Condições",
+    "humidity": "Humidade",
+    "humidityValue": "{{value}} %",
+    "wind": "Vento",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Pressão",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Nebulosidade",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "Índice UV",
+    "sunrise": "Nascer do sol",
+    "sunset": "Pôr do sol",
+    "precipitation": "Precipitação",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Probabilidade de chuva",
+    "windDir": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SO",
+      "W": "O",
+      "NW": "NO"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "pol"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Próximas 24 horas",
+    "dailyTitle": "Próximos 7 dias",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: máx {{high}}, mín {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Céu limpo",
+      "1": "Maioritariamente limpo",
+      "2": "Parcialmente nublado",
+      "3": "Encoberto",
+      "45": "Nevoeiro",
+      "48": "Nevoeiro com geada",
+      "51": "Chuvisco fraco",
+      "53": "Chuvisco",
+      "55": "Chuvisco forte",
+      "56": "Chuvisco gelado fraco",
+      "57": "Chuvisco gelado forte",
+      "61": "Chuva fraca",
+      "63": "Chuva",
+      "65": "Chuva forte",
+      "66": "Chuva gelada fraca",
+      "67": "Chuva gelada forte",
+      "71": "Neve fraca",
+      "73": "Neve",
+      "75": "Neve forte",
+      "77": "Grãos de neve",
+      "80": "Aguaceiros fracos",
+      "81": "Aguaceiros",
+      "82": "Aguaceiros fortes",
+      "85": "Aguaceiros de neve fracos",
+      "86": "Aguaceiros de neve fortes",
+      "95": "Trovoada",
+      "96": "Trovoada com granizo",
+      "99": "Trovoada forte com granizo"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Não foi possível carregar o tempo.",
+    "retry": "Tentar novamente",
+    "offlineHint": "Verifique a sua ligação e tente novamente."
+  },
+  "states": {
+    "offline": "Está offline. A mostrar os últimos dados em cache."
+  },
+  "liveRegion": {
+    "updated": "Tempo para {{city}} atualizado",
+    "loading": "A carregar tempo para {{city}}",
+    "error": "Não foi possível carregar o tempo para {{city}}"
+  },
+  "footer": {
+    "attribution": "Dados meteorológicos por Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Gratuito para uso não comercial sob CC-BY 4.0"
+  }
+}

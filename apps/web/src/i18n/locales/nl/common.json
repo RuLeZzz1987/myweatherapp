@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Naar hoofdinhoud springen",
+    "main": "Weer"
+  },
+  "header": {
+    "searchLabel": "Zoek een stad",
+    "searchPlaceholder": "Zoek een stad",
+    "languageLabel": "Taal",
+    "unitsLabel": "Eenheden",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Geen resultaten",
+    "loading": "Zoeken…",
+    "error": "Zoeken mislukt. Probeer opnieuw.",
+    "clear": "Zoekopdracht wissen"
+  },
+  "empty": {
+    "title": "Vind het weer, overal.",
+    "prompt": "Zoek een stad om de huidige omstandigheden en de komende week te zien.",
+    "useLocation": "Mijn locatie gebruiken"
+  },
+  "recents": {
+    "title": "Recente zoekopdrachten",
+    "cardLabel": "Toon weer voor {{city}}, momenteel {{temp}}",
+    "remove": "Verwijder {{city}} uit recente zoekopdrachten",
+    "clearAll": "Alles wissen"
+  },
+  "hero": {
+    "loading": "Weer laden…",
+    "labelTemperature": "Huidige temperatuur",
+    "labelCondition": "Huidige omstandigheid",
+    "feelsLike": "Gevoeld {{temp}}",
+    "asOf": "Per {{time}}",
+    "cached": "In cache sinds {{ago}}",
+    "stale": "Cachegegevens worden weergegeven – bron niet beschikbaar",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Omstandigheden",
+    "humidity": "Luchtvochtigheid",
+    "humidityValue": "{{value}} %",
+    "wind": "Wind",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Druk",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Bewolking",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "UV-index",
+    "sunrise": "Zonsopgang",
+    "sunset": "Zonsondergang",
+    "precipitation": "Neerslag",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Kans op regen",
+    "windDir": {
+      "N": "N",
+      "NE": "NO",
+      "E": "O",
+      "SE": "ZO",
+      "S": "Z",
+      "SW": "ZW",
+      "W": "W",
+      "NW": "NW"
+    },
+    "unit": {
+      "kmh": "km/u",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "inch"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Komende 24 uur",
+    "dailyTitle": "Komende 7 dagen",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: hoog {{high}}, laag {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Heldere hemel",
+      "1": "Overwegend helder",
+      "2": "Gedeeltelijk bewolkt",
+      "3": "Bewolkt",
+      "45": "Mist",
+      "48": "Aanvriezende mist",
+      "51": "Lichte motregen",
+      "53": "Motregen",
+      "55": "Zware motregen",
+      "56": "Lichte aanvriezende motregen",
+      "57": "Zware aanvriezende motregen",
+      "61": "Lichte regen",
+      "63": "Regen",
+      "65": "Zware regen",
+      "66": "Lichte aanvriezende regen",
+      "67": "Zware aanvriezende regen",
+      "71": "Lichte sneeuw",
+      "73": "Sneeuw",
+      "75": "Zware sneeuw",
+      "77": "Sneeuwkorrels",
+      "80": "Lichte regenbuien",
+      "81": "Regenbuien",
+      "82": "Zware regenbuien",
+      "85": "Lichte sneeuwbuien",
+      "86": "Zware sneeuwbuien",
+      "95": "Onweer",
+      "96": "Onweer met hagel",
+      "99": "Zwaar onweer met hagel"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Kan het weer niet laden.",
+    "retry": "Opnieuw proberen",
+    "offlineHint": "Controleer je verbinding en probeer het opnieuw."
+  },
+  "states": {
+    "offline": "Je bent offline. Laatste cachegegevens worden getoond."
+  },
+  "liveRegion": {
+    "updated": "Weer voor {{city}} bijgewerkt",
+    "loading": "Weer voor {{city}} laden",
+    "error": "Kan weer voor {{city}} niet laden"
+  },
+  "footer": {
+    "attribution": "Weergegevens door Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Gratis voor niet-commercieel gebruik onder CC-BY 4.0"
+  }
+}

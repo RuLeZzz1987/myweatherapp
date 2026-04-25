@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Przejdź do głównej treści",
+    "main": "Pogoda"
+  },
+  "header": {
+    "searchLabel": "Szukaj miasta",
+    "searchPlaceholder": "Szukaj miasta",
+    "languageLabel": "Język",
+    "unitsLabel": "Jednostki",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Brak wyników",
+    "loading": "Wyszukiwanie…",
+    "error": "Nie udało się wyszukać. Spróbuj ponownie.",
+    "clear": "Wyczyść wyszukiwanie"
+  },
+  "empty": {
+    "title": "Znajdź pogodę, gdziekolwiek.",
+    "prompt": "Wyszukaj miasto, aby zobaczyć aktualne warunki i nadchodzący tydzień.",
+    "useLocation": "Użyj mojej lokalizacji"
+  },
+  "recents": {
+    "title": "Ostatnie wyszukiwania",
+    "cardLabel": "Pokaż pogodę dla {{city}}, obecnie {{temp}}",
+    "remove": "Usuń {{city}} z ostatnich wyszukiwań",
+    "clearAll": "Wyczyść wszystko"
+  },
+  "hero": {
+    "loading": "Ładowanie pogody…",
+    "labelTemperature": "Aktualna temperatura",
+    "labelCondition": "Aktualne warunki",
+    "feelsLike": "Odczuwalna {{temp}}",
+    "asOf": "Stan na {{time}}",
+    "cached": "W pamięci podręcznej od {{ago}}",
+    "stale": "Wyświetlam dane z pamięci podręcznej — źródło niedostępne",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Warunki",
+    "humidity": "Wilgotność",
+    "humidityValue": "{{value}} %",
+    "wind": "Wiatr",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Ciśnienie",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Zachmurzenie",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "Indeks UV",
+    "sunrise": "Wschód słońca",
+    "sunset": "Zachód słońca",
+    "precipitation": "Opady",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Szansa na deszcz",
+    "windDir": {
+      "N": "N",
+      "NE": "NE",
+      "E": "E",
+      "SE": "SE",
+      "S": "S",
+      "SW": "SW",
+      "W": "W",
+      "NW": "NW"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "cale"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Następne 24 godziny",
+    "dailyTitle": "Następne 7 dni",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: maks {{high}}, min {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Bezchmurnie",
+      "1": "Przeważnie bezchmurnie",
+      "2": "Częściowe zachmurzenie",
+      "3": "Zachmurzenie całkowite",
+      "45": "Mgła",
+      "48": "Mgła szronowa",
+      "51": "Lekka mżawka",
+      "53": "Mżawka",
+      "55": "Silna mżawka",
+      "56": "Lekka marznąca mżawka",
+      "57": "Silna marznąca mżawka",
+      "61": "Lekki deszcz",
+      "63": "Deszcz",
+      "65": "Silny deszcz",
+      "66": "Lekki marznący deszcz",
+      "67": "Silny marznący deszcz",
+      "71": "Lekki śnieg",
+      "73": "Śnieg",
+      "75": "Silny śnieg",
+      "77": "Ziarna śniegu",
+      "80": "Lekkie przelotne deszcze",
+      "81": "Przelotne deszcze",
+      "82": "Silne przelotne deszcze",
+      "85": "Lekkie przelotne opady śniegu",
+      "86": "Silne przelotne opady śniegu",
+      "95": "Burza",
+      "96": "Burza z gradem",
+      "99": "Silna burza z gradem"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Nie udało się wczytać pogody.",
+    "retry": "Spróbuj ponownie",
+    "offlineHint": "Sprawdź połączenie i spróbuj ponownie."
+  },
+  "states": {
+    "offline": "Jesteś offline. Wyświetlam ostatnie zapisane dane."
+  },
+  "liveRegion": {
+    "updated": "Zaktualizowano pogodę dla {{city}}",
+    "loading": "Ładowanie pogody dla {{city}}",
+    "error": "Nie udało się załadować pogody dla {{city}}"
+  },
+  "footer": {
+    "attribution": "Dane pogodowe z Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Bezpłatne do użytku niekomercyjnego na licencji CC-BY 4.0"
+  }
+}

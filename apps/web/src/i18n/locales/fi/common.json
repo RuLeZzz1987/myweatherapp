@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Siirry pääsisältöön",
+    "main": "Sää"
+  },
+  "header": {
+    "searchLabel": "Hae kaupunkia",
+    "searchPlaceholder": "Hae kaupunkia",
+    "languageLabel": "Kieli",
+    "unitsLabel": "Yksiköt",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Ei osumia",
+    "loading": "Haetaan…",
+    "error": "Haku epäonnistui. Yritä uudelleen.",
+    "clear": "Tyhjennä haku"
+  },
+  "empty": {
+    "title": "Löydä sää, missä tahansa.",
+    "prompt": "Hae kaupunkia nähdäksesi nykyiset olosuhteet ja tulevan viikon.",
+    "useLocation": "Käytä sijaintiani"
+  },
+  "recents": {
+    "title": "Viimeisimmät haut",
+    "cardLabel": "Näytä sää kaupungille {{city}}, juuri nyt {{temp}}",
+    "remove": "Poista {{city}} viimeisimmistä hauista",
+    "clearAll": "Tyhjennä kaikki"
+  },
+  "hero": {
+    "loading": "Ladataan säätä…",
+    "labelTemperature": "Nykyinen lämpötila",
+    "labelCondition": "Nykyinen sää",
+    "feelsLike": "Tuntuu kuin {{temp}}",
+    "asOf": "Klo {{time}}",
+    "cached": "Välimuistissa {{ago}} sitten",
+    "stale": "Näytetään välimuistitietoja — lähde ei saatavilla",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Olosuhteet",
+    "humidity": "Kosteus",
+    "humidityValue": "{{value}} %",
+    "wind": "Tuuli",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Paine",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Pilvisyys",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "UV-indeksi",
+    "sunrise": "Auringonnousu",
+    "sunset": "Auringonlasku",
+    "precipitation": "Sademäärä",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Sateen todennäköisyys",
+    "windDir": {
+      "N": "P",
+      "NE": "KO",
+      "E": "I",
+      "SE": "KA",
+      "S": "E",
+      "SW": "LO",
+      "W": "L",
+      "NW": "LU"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "tuumaa"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Seuraavat 24 tuntia",
+    "dailyTitle": "Seuraavat 7 päivää",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: ylin {{high}}, alin {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Selkeää",
+      "1": "Enimmäkseen selkeää",
+      "2": "Puolipilvistä",
+      "3": "Pilvistä",
+      "45": "Sumua",
+      "48": "Huurresumua",
+      "51": "Heikkoa tihkua",
+      "53": "Tihkusadetta",
+      "55": "Voimakasta tihkua",
+      "56": "Heikkoa jäätävää tihkua",
+      "57": "Voimakasta jäätävää tihkua",
+      "61": "Heikkoa sadetta",
+      "63": "Sadetta",
+      "65": "Voimakasta sadetta",
+      "66": "Heikkoa jäätävää sadetta",
+      "67": "Voimakasta jäätävää sadetta",
+      "71": "Heikkoa lumisadetta",
+      "73": "Lumisadetta",
+      "75": "Voimakasta lumisadetta",
+      "77": "Lumirakeita",
+      "80": "Heikkoja sadekuuroja",
+      "81": "Sadekuuroja",
+      "82": "Voimakkaita sadekuuroja",
+      "85": "Heikkoja lumikuuroja",
+      "86": "Voimakkaita lumikuuroja",
+      "95": "Ukkosta",
+      "96": "Ukkosta ja rakeita",
+      "99": "Voimakasta ukkosta ja rakeita"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Säätä ei voitu ladata.",
+    "retry": "Yritä uudelleen",
+    "offlineHint": "Tarkista yhteytesi ja yritä uudelleen."
+  },
+  "states": {
+    "offline": "Olet offline-tilassa. Näytetään viimeisimmät välimuistitiedot."
+  },
+  "liveRegion": {
+    "updated": "Sää päivitetty kaupungille {{city}}",
+    "loading": "Ladataan säätä kaupungille {{city}}",
+    "error": "Säätä ei voitu ladata kaupungille {{city}}"
+  },
+  "footer": {
+    "attribution": "Säätiedot Open-Meteosta",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Ilmainen ei-kaupalliseen käyttöön CC-BY 4.0 -lisenssillä"
+  }
+}

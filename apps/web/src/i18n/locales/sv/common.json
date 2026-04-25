@@ -1,0 +1,135 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "skipToContent": "Hoppa till huvudinnehåll",
+    "main": "Väder"
+  },
+  "header": {
+    "searchLabel": "Sök efter en stad",
+    "searchPlaceholder": "Sök efter en stad",
+    "languageLabel": "Språk",
+    "unitsLabel": "Enheter",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "Inga träffar",
+    "loading": "Söker…",
+    "error": "Det gick inte att söka. Försök igen.",
+    "clear": "Rensa sökning"
+  },
+  "empty": {
+    "title": "Hitta vädret, var som helst.",
+    "prompt": "Sök efter en stad för att se aktuella förhållanden och veckan framöver.",
+    "useLocation": "Använd min plats"
+  },
+  "recents": {
+    "title": "Senaste sökningar",
+    "cardLabel": "Visa väder för {{city}}, just nu {{temp}}",
+    "remove": "Ta bort {{city}} från senaste sökningar",
+    "clearAll": "Rensa alla"
+  },
+  "hero": {
+    "loading": "Laddar väder…",
+    "labelTemperature": "Aktuell temperatur",
+    "labelCondition": "Aktuellt förhållande",
+    "feelsLike": "Känns som {{temp}}",
+    "asOf": "Klockan {{time}}",
+    "cached": "Cachat sedan {{ago}}",
+    "stale": "Visar cachade data – källan är otillgänglig",
+    "selectionLabel": "{{name}}, {{country}}"
+  },
+  "stats": {
+    "title": "Förhållanden",
+    "humidity": "Luftfuktighet",
+    "humidityValue": "{{value}} %",
+    "wind": "Vind",
+    "windValue": "{{speed}} {{unit}} {{direction}}",
+    "pressure": "Tryck",
+    "pressureValue": "{{value}} hPa",
+    "cloudCover": "Molnighet",
+    "cloudCoverValue": "{{value}} %",
+    "uvIndex": "UV-index",
+    "sunrise": "Soluppgång",
+    "sunset": "Solnedgång",
+    "precipitation": "Nederbörd",
+    "precipitationValue": "{{value}} {{unit}}",
+    "precipitationProbability": "Risk för regn",
+    "windDir": {
+      "N": "N",
+      "NE": "NO",
+      "E": "O",
+      "SE": "SO",
+      "S": "S",
+      "SW": "SV",
+      "W": "V",
+      "NW": "NV"
+    },
+    "unit": {
+      "kmh": "km/h",
+      "mph": "mph",
+      "mm": "mm",
+      "in": "tum"
+    }
+  },
+  "forecast": {
+    "hourlyTitle": "Närmaste 24 timmarna",
+    "dailyTitle": "Närmaste 7 dagarna",
+    "hourLabel": "{{time}}: {{temp}}, {{condition}}",
+    "dayLabel": "{{day}}: hög {{high}}, låg {{low}}, {{condition}}"
+  },
+  "weather": {
+    "code": {
+      "0": "Klart",
+      "1": "Mestadels klart",
+      "2": "Halvklart",
+      "3": "Mulet",
+      "45": "Dimma",
+      "48": "Rimfrostdimma",
+      "51": "Lätt duggregn",
+      "53": "Duggregn",
+      "55": "Kraftigt duggregn",
+      "56": "Lätt underkylt duggregn",
+      "57": "Kraftigt underkylt duggregn",
+      "61": "Lätt regn",
+      "63": "Regn",
+      "65": "Kraftigt regn",
+      "66": "Lätt underkylt regn",
+      "67": "Kraftigt underkylt regn",
+      "71": "Lätt snöfall",
+      "73": "Snöfall",
+      "75": "Kraftigt snöfall",
+      "77": "Snökorn",
+      "80": "Lätta regnskurar",
+      "81": "Regnskurar",
+      "82": "Kraftiga regnskurar",
+      "85": "Lätta snöbyar",
+      "86": "Kraftiga snöbyar",
+      "95": "Åskväder",
+      "96": "Åska med hagel",
+      "99": "Kraftigt åskväder med hagel"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Det gick inte att läsa in vädret.",
+    "retry": "Försök igen",
+    "offlineHint": "Kontrollera anslutningen och försök igen."
+  },
+  "states": {
+    "offline": "Du är offline. Visar senaste cachade data."
+  },
+  "liveRegion": {
+    "updated": "Vädret för {{city}} uppdaterat",
+    "loading": "Laddar väder för {{city}}",
+    "error": "Det gick inte att läsa in vädret för {{city}}"
+  },
+  "footer": {
+    "attribution": "Väderdata från Open-Meteo",
+    "attributionLink": "https://open-meteo.com/",
+    "license": "Gratis för icke-kommersiell användning under CC-BY 4.0"
+  }
+}
