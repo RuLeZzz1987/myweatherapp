@@ -11,7 +11,6 @@ import { join } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-// @ts-expect-error -- plain ESM script, no .d.ts.
 import {
   runI18nCheck,
   baseKey,
