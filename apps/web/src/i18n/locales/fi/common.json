@@ -20,7 +20,9 @@
     "noResults": "Ei osumia",
     "loading": "Haetaan…",
     "error": "Haku epäonnistui. Yritä uudelleen.",
-    "clear": "Tyhjennä haku"
+    "clear": "Tyhjennä haku",
+    "resultsCount_one": "1 tulos saatavilla",
+    "resultsCount_other": "{{count}} tulosta saatavilla"
   },
   "empty": {
     "title": "Löydä sää, missä tahansa.",

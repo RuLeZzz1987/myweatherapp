@@ -20,7 +20,9 @@
     "noResults": "Keine Treffer",
     "loading": "Suche läuft…",
     "error": "Suche fehlgeschlagen. Bitte erneut versuchen.",
-    "clear": "Suche leeren"
+    "clear": "Suche leeren",
+    "resultsCount_one": "1 Ergebnis verfügbar",
+    "resultsCount_other": "{{count}} Ergebnisse verfügbar"
   },
   "empty": {
     "title": "Finde das Wetter, überall.",

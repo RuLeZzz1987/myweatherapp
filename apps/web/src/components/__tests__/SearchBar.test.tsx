@@ -131,6 +131,26 @@ describe('<SearchBar />', () => {
     expect(input).toHaveValue('');
   });
 
+  it('announces the result count via a polite live region (WCAG 4.1.3)', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<SearchBar onSelect={() => undefined} />);
+
+    const input = screen.getByRole('combobox', { name: 'Search for a city' });
+    await user.type(input, 'paris');
+
+    // Two real "Paris" results in MSW handlers; the live region is the
+    // <span role="status"> sibling of the listbox, scoped via getAllByRole
+    // because <li role="option" aria-disabled> instances also have role=status
+    // ancestors in some screen-reader trees.
+    await waitFor(() => {
+      const status = screen
+        .getAllByRole('status')
+        .find((n) => /results available/i.test(n.textContent ?? ''));
+      expect(status).toBeDefined();
+      expect(status!.textContent).toMatch(/^2 results available$/);
+    });
+  });
+
   it('shows a "no matches" hint when the geocoder returns an empty list', async () => {
     const user = userEvent.setup();
     renderWithProviders(<SearchBar onSelect={() => undefined} />);

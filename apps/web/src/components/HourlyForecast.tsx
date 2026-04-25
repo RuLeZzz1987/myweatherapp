@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatTemperature, formatTime } from '../i18n/format';
-import type { Units, WeatherDaily, WeatherHourly, WeatherResponse } from '../lib/api/types';
+import type { WeatherDaily, WeatherHourly, WeatherResponse } from '../lib/api/types';
 import { roundInt } from '../lib/units';
 import { WeatherIllustration } from './WeatherIllustration';
 
@@ -22,7 +22,6 @@ import { WeatherIllustration } from './WeatherIllustration';
 
 export interface HourlyForecastProps {
   weather: WeatherResponse;
-  units: Units;
   locale: string;
   /** Override "now" (testing). */
   now?: Date;
@@ -30,12 +29,13 @@ export interface HourlyForecastProps {
 
 const HOURS = 24;
 
-export function HourlyForecast({ weather, units, locale, now }: HourlyForecastProps) {
+// Numeric values come pre-converted from the worker (it forwards the
+// active `units` to Open-Meteo as `temperature_unit`/`wind_speed_unit`/
+// `precipitation_unit`), so this component reads `weather.units` for
+// formatting and doesn't need a separate `units` prop.
+
+export function HourlyForecast({ weather, locale, now }: HourlyForecastProps) {
   const { t } = useTranslation();
-  // The temperature numbers are already in `units` because the worker
-  // refetches with the right `temperature_unit`. We accept the prop
-  // for symmetry with the other forecast components.
-  void units;
 
   const slice = useMemo<WeatherHourly[]>(() => {
     if (weather.hourly.length === 0) return [];

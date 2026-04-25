@@ -20,7 +20,9 @@
     "noResults": "Inga träffar",
     "loading": "Söker…",
     "error": "Det gick inte att söka. Försök igen.",
-    "clear": "Rensa sökning"
+    "clear": "Rensa sökning",
+    "resultsCount_one": "1 resultat tillgängligt",
+    "resultsCount_other": "{{count}} resultat tillgängliga"
   },
   "empty": {
     "title": "Hitta vädret, var som helst.",

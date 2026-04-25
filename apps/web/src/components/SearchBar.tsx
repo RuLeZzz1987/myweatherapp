@@ -67,7 +67,7 @@ export function SearchBar({ onSelect, initialValue = '', clearOnSelect = true }:
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const debouncedValue = useDebouncedValue(value, DEBOUNCE_MS);
-  const { data, isLoading, isError, isFetching } = useGeocode(debouncedValue, {
+  const { data, isLoading, isError } = useGeocode(debouncedValue, {
     language: activeLocale,
   });
   const results = useMemo<GeocodeResult[]>(() => data?.results ?? [], [data]);
@@ -239,20 +239,24 @@ export function SearchBar({ onSelect, initialValue = '', clearOnSelect = true }:
         )}
       </ul>
 
-      {/* Off-screen polite live region so the result count is announced
-          to screen readers even though visual focus stays in the input. */}
-      <span className="sr-only" aria-live="polite">
-        {showListbox && !isLoading && !tooShort && !isError
-          ? results.length === 0
-            ? t('search.noResults')
-            : t('search.resultLocation', {
-                name: results[0]?.name ?? '',
-                country: results[0] ? formatCountry(results[0].countryCode, activeLocale) : '',
-              })
-          : ''}
+      {/* Off-screen polite live region. WAI-ARIA Authoring Practices
+          1.2 says comboboxes should announce result COUNT, not the
+          first option's content (the active option is already exposed
+          via aria-activedescendant). This satisfies WCAG 2.1 SC 4.1.3
+          "Status Messages". We rely on i18next CLDR plurals for the
+          count copy. */}
+      <span className="sr-only" role="status" aria-live="polite">
+        {searchStatusMessage()}
       </span>
-      {/* Reserve a slot for the in-flight indicator (used in §10 step 9). */}
-      <span aria-hidden="true" data-fetching={isFetching} hidden />
     </div>
   );
+
+  function searchStatusMessage(): string {
+    if (!showListbox) return '';
+    if (isError) return t('search.error');
+    if (isLoading && !tooShort) return t('search.loading');
+    if (tooShort) return '';
+    if (results.length === 0) return t('search.noResults');
+    return t('search.resultsCount', { count: results.length });
+  }
 }

@@ -20,7 +20,9 @@
     "noResults": "No matches",
     "loading": "Searching…",
     "error": "Couldn't search. Try again.",
-    "clear": "Clear search"
+    "clear": "Clear search",
+    "resultsCount_one": "1 result available",
+    "resultsCount_other": "{{count}} results available"
   },
   "empty": {
     "title": "Find the weather, anywhere.",

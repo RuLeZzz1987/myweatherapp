@@ -60,14 +60,14 @@ describe('<DailyForecast />', () => {
   });
 
   it('renders the section header and 7 rows', () => {
-    renderWithProviders(<DailyForecast weather={buildWeather()} units="metric" locale="en" />);
+    renderWithProviders(<DailyForecast weather={buildWeather()} locale="en" />);
     expect(screen.getByText('Next 7 days')).toBeInTheDocument();
     const list = screen.getByRole('list');
     expect(list.querySelectorAll('li')).toHaveLength(7);
   });
 
   it('renders weekday + condition + low/high per row', () => {
-    renderWithProviders(<DailyForecast weather={buildWeather()} units="metric" locale="en" />);
+    renderWithProviders(<DailyForecast weather={buildWeather()} locale="en" />);
     // Each row's aria-label encodes "{day}: high {high}, low {low}, {condition}"
     const rows = screen.getAllByRole('listitem');
     rows.forEach((row) => {
@@ -77,9 +77,7 @@ describe('<DailyForecast />', () => {
 
   it('renders nothing when daily is empty', () => {
     const empty = { ...buildWeather(), daily: [] };
-    const { container } = renderWithProviders(
-      <DailyForecast weather={empty} units="metric" locale="en" />,
-    );
+    const { container } = renderWithProviders(<DailyForecast weather={empty} locale="en" />);
     expect(container).toBeEmptyDOMElement();
   });
 });

@@ -142,9 +142,12 @@ function App() {
         <OfflineBanner online={online} />
 
         <LiveRegion
+          // Parent supplies `key` so each fresh announcement is a
+          // remount — see LiveRegion.tsx for why setting key on the
+          // returned JSX wouldn't survive memoization.
+          key={`${liveRegionStatus(weatherQuery)}:${weatherQuery.dataUpdatedAt}`}
           cityLabel={cityLabel}
           status={liveRegionStatus(weatherQuery)}
-          tick={weatherQuery.dataUpdatedAt}
         />
 
         <section className="flex flex-1 flex-col gap-8">
@@ -156,8 +159,8 @@ function App() {
                 preferredUnits={units}
               />
               <SecondaryStats weather={weatherQuery.data} units={units} locale={locale} />
-              <HourlyForecast weather={weatherQuery.data} units={units} locale={locale} />
-              <DailyForecast weather={weatherQuery.data} units={units} locale={locale} />
+              <HourlyForecast weather={weatherQuery.data} locale={locale} />
+              <DailyForecast weather={weatherQuery.data} locale={locale} />
             </>
           ) : selection && weatherQuery.isError ? (
             <ErrorState

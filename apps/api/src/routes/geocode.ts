@@ -10,8 +10,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { getCache } from '../do/WeatherCache';
-import type { GeocodeResult } from '../types';
-import type { Env } from '../types';
+import type { Env, GeocodeResult } from '../types';
 import { UpstreamError, geocode } from '../upstream/openMeteo';
 
 const GEOCODE_TTL_MS = 24 * 60 * 60 * 1_000;

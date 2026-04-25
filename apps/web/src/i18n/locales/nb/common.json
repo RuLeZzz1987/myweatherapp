@@ -20,7 +20,9 @@
     "noResults": "Ingen treff",
     "loading": "Søker…",
     "error": "Kunne ikke søke. Prøv igjen.",
-    "clear": "Tøm søk"
+    "clear": "Tøm søk",
+    "resultsCount_one": "1 resultat tilgjengelig",
+    "resultsCount_other": "{{count}} resultater tilgjengelig"
   },
   "empty": {
     "title": "Finn været, hvor som helst.",

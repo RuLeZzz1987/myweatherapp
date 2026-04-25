@@ -20,7 +20,9 @@
     "noResults": "Aucun résultat",
     "loading": "Recherche…",
     "error": "Recherche impossible. Réessayez.",
-    "clear": "Effacer la recherche"
+    "clear": "Effacer la recherche",
+    "resultsCount_one": "1 résultat disponible",
+    "resultsCount_other": "{{count}} résultats disponibles"
   },
   "empty": {
     "title": "Trouvez la météo, partout.",

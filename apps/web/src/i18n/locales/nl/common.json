@@ -20,7 +20,9 @@
     "noResults": "Geen resultaten",
     "loading": "Zoeken…",
     "error": "Zoeken mislukt. Probeer opnieuw.",
-    "clear": "Zoekopdracht wissen"
+    "clear": "Zoekopdracht wissen",
+    "resultsCount_one": "1 resultaat beschikbaar",
+    "resultsCount_other": "{{count}} resultaten beschikbaar"
   },
   "empty": {
     "title": "Vind het weer, overal.",

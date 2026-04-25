@@ -3,15 +3,6 @@ import { useTranslation } from 'react-i18next';
 interface LiveRegionProps {
   cityLabel: string | null;
   status: 'idle' | 'loading' | 'success' | 'error';
-  /**
-   * Increment whenever a fresh weather payload arrives so the live
-   * region re-announces "Weather for X updated" — even if the
-   * computed message string would be identical to the previous one.
-   * Used as part of the React `key` so the region remounts and
-   * screen readers replay it. TanStack Query's `dataUpdatedAt`
-   * works well as the source.
-   */
-  tick: number;
 }
 
 /**
@@ -20,10 +11,25 @@ interface LiveRegionProps {
  * strings depending on the query state. Empty between announcements
  * so screen readers don't keep replaying the last message.
  *
- * `key` carries the tick so a successful refetch re-mounts the
- * region and assistive tech replays the announcement.
+ * **Re-announcing identical messages**: React only sees a new mount
+ * when its identity changes, so when the *content* of two consecutive
+ * announcements would be the same string (e.g. two successful
+ * refetches of "Weather for Oslo updated"), screen readers may not
+ * replay it. The parent should pass a `key` whose value changes on
+ * each fresh announcement to force a remount, e.g.:
+ *
+ *     <LiveRegion
+ *       key={`${status}:${dataUpdatedAt}`}
+ *       cityLabel={…}
+ *       status={…}
+ *     />
+ *
+ * Setting `key` on the parent's JSX (rather than internally on what
+ * this component returns) is the canonical React API — it survives
+ * `React.memo` wrapping and StrictMode re-renders. See the React
+ * docs on "Resetting state with a key".
  */
-export function LiveRegion({ cityLabel, status, tick }: LiveRegionProps) {
+export function LiveRegion({ cityLabel, status }: LiveRegionProps) {
   const { t } = useTranslation();
   const message = computeMessage({ cityLabel, status, t });
 
@@ -34,7 +40,6 @@ export function LiveRegion({ cityLabel, status, tick }: LiveRegionProps) {
       aria-atomic="true"
       className="sr-only"
       data-testid="live-region"
-      key={`${status}:${tick}`}
     >
       {message}
     </p>

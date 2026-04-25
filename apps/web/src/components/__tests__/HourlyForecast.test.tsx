@@ -61,7 +61,6 @@ describe('<HourlyForecast />', () => {
     renderWithProviders(
       <HourlyForecast
         weather={buildWeather()}
-        units="metric"
         locale="en"
         now={new Date('2026-04-25T12:00:00Z')}
       />,
@@ -73,7 +72,6 @@ describe('<HourlyForecast />', () => {
     renderWithProviders(
       <HourlyForecast
         weather={buildWeather()}
-        units="metric"
         locale="en"
         now={new Date('2026-04-25T12:00:00Z')}
       />,
@@ -87,7 +85,6 @@ describe('<HourlyForecast />', () => {
     renderWithProviders(
       <HourlyForecast
         weather={buildWeather()}
-        units="metric"
         locale="en"
         now={new Date('2026-04-25T00:00:00Z')}
       />,
@@ -97,9 +94,7 @@ describe('<HourlyForecast />', () => {
 
   it('renders nothing when hourly is empty', () => {
     const empty = { ...buildWeather(), hourly: [] };
-    const { container } = renderWithProviders(
-      <HourlyForecast weather={empty} units="metric" locale="en" />,
-    );
+    const { container } = renderWithProviders(<HourlyForecast weather={empty} locale="en" />);
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -109,12 +104,7 @@ describe('<HourlyForecast />', () => {
     const idx = weather.hourly.findIndex((h) => h.time === '2026-04-25T05:00');
     weather.hourly[idx] = { ...weather.hourly[idx]!, precipitationProbability: null };
     renderWithProviders(
-      <HourlyForecast
-        weather={weather}
-        units="metric"
-        locale="en"
-        now={new Date('2026-04-25T00:00:00Z')}
-      />,
+      <HourlyForecast weather={weather} locale="en" now={new Date('2026-04-25T00:00:00Z')} />,
     );
     expect(screen.queryByText('60%')).not.toBeInTheDocument();
   });
@@ -147,12 +137,7 @@ describe('<HourlyForecast />', () => {
       { time: '2026-04-25T08:00', temperature: 9, precipitationProbability: 0, weatherCode: 0 },
     ];
     const { container } = renderWithProviders(
-      <HourlyForecast
-        weather={weather}
-        units="metric"
-        locale="en"
-        now={new Date('2026-04-25T03:00:00Z')}
-      />,
+      <HourlyForecast weather={weather} locale="en" now={new Date('2026-04-25T03:00:00Z')} />,
     );
     const items = container.querySelectorAll('li');
     expect(items.length).toBe(2);

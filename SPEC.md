@@ -47,25 +47,25 @@
 
 ## 2. Tech stack
 
-| Concern                | Choice                                                                                                                                                 | Why                                                                                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Package manager        | **pnpm**                                                                                                                                               | Required by brief                                                                                                                           |
-| Build tool             | **Vite**                                                                                                                                               | Required by brief                                                                                                                           |
-| Language               | **TypeScript** (strict)                                                                                                                                | Type safety, better DX                                                                                                                      |
-| UI framework           | **React 18+**                                                                                                                                          | Required                                                                                                                                    |
-| Styling                | **Tailwind CSS v4** + CSS variables for theming                                                                                                        | Fast, responsive, design-token friendly                                                                                                     |
-| State                  | React local state + **TanStack Query** (server cache) + small Zustand store for UI prefs                                                               | Right tool per concern; avoids Redux overkill                                                                                               |
-| Routing                | **React Router** (single `/` route + deep-link `/?q=Berlin&lang=de`)                                                                                   | Lightweight                                                                                                                                 |
-| i18n / l10n            | **`react-i18next`** + **`i18next-browser-languagedetector`** + native `Intl.*` (NumberFormat, DateTimeFormat, RelativeTimeFormat, DisplayNames)        | Mature, lazy-loadable JSON catalogs, plurals/ICU, low bundle cost. `Intl.*` covers number/date/relative-time formatting without extra deps. |
-| Backend                | **Cloudflare Worker** (Hono) with **Durable Object** (`WeatherCache`)                                                                                  | Required by brief                                                                                                                           |
-| Weather data           | **Open-Meteo** forecast API (free, no registration)                                                                                                    | Locked in; only displays fields free tier returns. CC-BY 4.0 attribution in footer.                                                         |
-| Geocoding              | **Open-Meteo Geocoding** API (free, no registration)                                                                                                   | Same family, same terms                                                                                                                     |
-| Charts                 | **Recharts** or `visx` (pick Recharts; smaller learning surface)                                                                                       | Hourly forecast viz                                                                                                                         |
-| Icons / weather glyphs | **lucide-react** + custom SVG weather icons mapped from WMO codes                                                                                      | Crisp, accessible                                                                                                                           |
-| Testing                | **Vitest** + **React Testing Library** + **@testing-library/user-event** + **MSW**                                                                     | Unit + integration coverage; no separate E2E rig                                                                                            |
-| Lint / format          | **ESLint** (typescript-eslint, react-hooks, jsx-a11y) + **Prettier**                                                                                   | Required for code quality criterion                                                                                                         |
-| CI                     | GitHub Actions: install → typecheck → lint → test → build                                                                                              | Catches regressions                                                                                                                         |
-| Deploy                 | **Single Cloudflare Worker** with Static Assets serving the SPA build and `/api/*` routes, bound to the `WeatherCache` Durable Object (SQLite backend) | Free tier, one URL, no CORS, one deploy command (see §0.1, §8)                                                                              |
+| Concern                | Choice                                                                                                                                                             | Why                                                                                                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Package manager        | **pnpm**                                                                                                                                                           | Required by brief                                                                                                                                                                        |
+| Build tool             | **Vite**                                                                                                                                                           | Required by brief                                                                                                                                                                        |
+| Language               | **TypeScript** (strict)                                                                                                                                            | Type safety, better DX                                                                                                                                                                   |
+| UI framework           | **React 18+**                                                                                                                                                      | Required                                                                                                                                                                                 |
+| Styling                | **Tailwind CSS v4** + CSS variables for theming                                                                                                                    | Fast, responsive, design-token friendly                                                                                                                                                  |
+| State                  | React local state + **TanStack Query** (server cache) + small Zustand store for UI prefs                                                                           | Right tool per concern; avoids Redux overkill                                                                                                                                            |
+| Routing                | **No client router** — single `/` route + deep-link via raw `URLSearchParams` (`/?lat=…&lon=…&name=…&lang=de`) wired through the `useUrlSelection` hook (see §6.7) | The app has one screen and one query-string contract; React Router would buy us nothing for that and would add weight to the bundle. Deliberate skip; revisit if a 2nd route ever lands. |
+| i18n / l10n            | **`react-i18next`** + **`i18next-browser-languagedetector`** + native `Intl.*` (NumberFormat, DateTimeFormat, RelativeTimeFormat, DisplayNames)                    | Mature, lazy-loadable JSON catalogs, plurals/ICU, low bundle cost. `Intl.*` covers number/date/relative-time formatting without extra deps.                                              |
+| Backend                | **Cloudflare Worker** (Hono) with **Durable Object** (`WeatherCache`)                                                                                              | Required by brief                                                                                                                                                                        |
+| Weather data           | **Open-Meteo** forecast API (free, no registration)                                                                                                                | Locked in; only displays fields free tier returns. CC-BY 4.0 attribution in footer.                                                                                                      |
+| Geocoding              | **Open-Meteo Geocoding** API (free, no registration)                                                                                                               | Same family, same terms                                                                                                                                                                  |
+| Charts                 | **Recharts** or `visx` (pick Recharts; smaller learning surface)                                                                                                   | Hourly forecast viz                                                                                                                                                                      |
+| Icons / weather glyphs | **lucide-react** + custom SVG weather icons mapped from WMO codes                                                                                                  | Crisp, accessible                                                                                                                                                                        |
+| Testing                | **Vitest** + **React Testing Library** + **@testing-library/user-event** + **MSW**                                                                                 | Unit + integration coverage; no separate E2E rig                                                                                                                                         |
+| Lint / format          | **ESLint** (typescript-eslint, react-hooks, jsx-a11y) + **Prettier**                                                                                               | Required for code quality criterion                                                                                                                                                      |
+| CI                     | GitHub Actions: install → typecheck → lint → test → build                                                                                                          | Catches regressions                                                                                                                                                                      |
+| Deploy                 | **Single Cloudflare Worker** with Static Assets serving the SPA build and `/api/*` routes, bound to the `WeatherCache` Durable Object (SQLite backend)             | Free tier, one URL, no CORS, one deploy command (see §0.1, §8)                                                                                                                           |
 
 ---
 
@@ -84,6 +84,11 @@ Hack/Staffer/
 ├── eslint.config.js
 ├── tsconfig.base.json
 ├── .github/workflows/ci.yml
+├── packages/
+│   └── contracts/                  # @myweather/contracts — shared wire types
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── src/index.ts            # GeocodeResult, WeatherResponse, …
 └── apps/
     ├── web/                       # Vite + React frontend
     │   ├── index.html
@@ -92,7 +97,7 @@ Hack/Staffer/
     │   ├── src/
     │   │   ├── main.tsx
     │   │   ├── App.tsx
-    │   │   ├── router.tsx
+    │   │   # (no router.tsx — single-route SPA, see §3 "Routing" row)
     │   │   ├── api/
     │   │   │   ├── client.ts       # fetch wrapper, types
     │   │   │   └── weather.ts      # query hooks (useWeather, useGeocode)
@@ -159,7 +164,7 @@ Hack/Staffer/
         │   │   └── WeatherCache.ts # Durable Object
         │   ├── upstream/
         │   │   └── openMeteo.ts    # typed upstream client
-        │   └── types.ts
+        │   └── types.ts            # Worker-only `Env`; wire types re-exported from @myweather/contracts
         └── test/
             ├── weatherCache.test.ts
             └── routes.test.ts      # uses unstable_dev / miniflare
@@ -448,8 +453,11 @@ Other locales mirror the same key set. WMO weather codes map to keys `weather.co
 
 The shapes below mirror exactly what the free Open-Meteo tier returns — no field is invented or filled with mock data. Optional fields are only present when the upstream actually provides them.
 
+These types live in the `@myweather/contracts` workspace package (`packages/contracts/src/index.ts`); both `@myweather/api` and `@myweather/web` depend on it via `workspace:*`. The barrel files at `apps/api/src/types.ts` and `apps/web/src/lib/api/types.ts` re-export from the package so existing relative imports keep working without churn.
+
 ```ts
-// shared/types.ts (duplicated to both apps or via a small workspace package)
+// packages/contracts/src/index.ts — single source of truth, imported via
+//   `import type { WeatherResponse } from '@myweather/contracts';`
 export type Units = 'metric' | 'imperial';
 
 export interface GeocodeResult {
@@ -565,7 +573,7 @@ Deployment target: **single Cloudflare Worker with Static Assets** (Option A, lo
 
 `.github/workflows/ci.yml`:
 
-1. Setup pnpm + Node 20.
+1. Setup pnpm + Node 22 (matches the `engines.node` floor in `package.json` and the `actions/setup-node` pin in `.github/workflows/ci.yml`).
 2. `pnpm install --frozen-lockfile`.
 3. `pnpm -r typecheck`.
 4. `pnpm -r lint`.

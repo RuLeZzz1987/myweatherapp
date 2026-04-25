@@ -20,7 +20,9 @@
     "noResults": "Brak wyników",
     "loading": "Wyszukiwanie…",
     "error": "Nie udało się wyszukać. Spróbuj ponownie.",
-    "clear": "Wyczyść wyszukiwanie"
+    "clear": "Wyczyść wyszukiwanie",
+    "resultsCount_one": "1 wynik dostępny",
+    "resultsCount_other": "{{count}} wyników dostępnych"
   },
   "empty": {
     "title": "Znajdź pogodę, gdziekolwiek.",

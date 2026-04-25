@@ -20,7 +20,9 @@
     "noResults": "Sin resultados",
     "loading": "Buscando…",
     "error": "No se pudo buscar. Inténtalo de nuevo.",
-    "clear": "Borrar búsqueda"
+    "clear": "Borrar búsqueda",
+    "resultsCount_one": "1 resultado disponible",
+    "resultsCount_other": "{{count}} resultados disponibles"
   },
   "empty": {
     "title": "Encuentra el tiempo, en cualquier lugar.",

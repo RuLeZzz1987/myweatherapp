@@ -1,28 +1,28 @@
 import { useTranslation } from 'react-i18next';
 
 import { formatTemperature, formatWeekday } from '../i18n/format';
-import type { Units, WeatherResponse } from '../lib/api/types';
+import type { WeatherResponse } from '../lib/api/types';
 import { WeatherIllustration } from './WeatherIllustration';
 
 /**
  * 7-day strip — vertical list on mobile, condensed on desktop. Uses
  * `Intl.DateTimeFormat({ weekday: 'short' })` so non-English locales
  * get the right abbreviation out of the box.
+ *
+ * Numeric values come pre-converted from the worker (it forwards the
+ * active `units` to Open-Meteo upstream), so this component reads
+ * `weather.units` for formatting and doesn't take a separate `units`
+ * prop.
  */
 
 export interface DailyForecastProps {
   weather: WeatherResponse;
-  units: Units;
   locale: string;
 }
 
-export function DailyForecast({ weather, units, locale }: DailyForecastProps) {
+export function DailyForecast({ weather, locale }: DailyForecastProps) {
   const { t } = useTranslation();
   if (weather.daily.length === 0) return null;
-  // `units` only matters for the unit label echoed in `aria-label`s;
-  // the numeric values are already in the active unit (the worker
-  // refetches when units change).
-  void units;
 
   return (
     <section aria-labelledby="daily-heading" className="flex flex-col gap-3">

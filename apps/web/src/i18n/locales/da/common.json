@@ -20,7 +20,9 @@
     "noResults": "Ingen resultater",
     "loading": "Søger…",
     "error": "Kunne ikke søge. Prøv igen.",
-    "clear": "Ryd søgning"
+    "clear": "Ryd søgning",
+    "resultsCount_one": "1 resultat tilgængeligt",
+    "resultsCount_other": "{{count}} resultater tilgængelige"
   },
   "empty": {
     "title": "Find vejret, hvor som helst.",
