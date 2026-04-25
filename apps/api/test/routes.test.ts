@@ -220,9 +220,102 @@ describe('GET /api/weather', () => {
     const res = await SELF.fetch('http://test/api/weather?lat=1&lon=2&units=metric');
     expect(res.status).toBe(502);
   });
+
+  it('drops hourly/daily entries when their anchor metric is null', async () => {
+    // Open-Meteo can null out individual indices when a model lacks data
+    // for that hour or day. We must not silently render those as 0 — the
+    // upstream client drops null-anchored slots and propagates null for
+    // the optional metrics (probability, UV).
+    const payload = sampleForecast();
+    payload.hourly = {
+      time: ['2026-04-25T13:00', '2026-04-25T14:00', '2026-04-25T15:00'],
+      temperature_2m: [4.2, null, 5.1],
+      precipitation_probability: [5, 8, null],
+      weather_code: [3, 3, null],
+    };
+    payload.daily = {
+      time: ['2026-04-25', '2026-04-26'],
+      weather_code: [3, null],
+      temperature_2m_max: [6, null],
+      temperature_2m_min: [1, 2],
+      apparent_temperature_max: [4, 3],
+      apparent_temperature_min: [-2, -1],
+      sunrise: ['2026-04-25T05:30', '2026-04-26T05:28'],
+      sunset: ['2026-04-25T20:45', '2026-04-26T20:47'],
+      uv_index_max: [null, 4],
+      precipitation_sum: [0, 0],
+      precipitation_probability_max: [null, 20],
+      wind_speed_10m_max: [18, 16],
+      wind_direction_10m_dominant: [260, 240],
+    };
+    mockFetch(
+      (url) => url.startsWith(FORECAST_URL),
+      () => jsonReply(200, payload),
+    );
+
+    const res = await SELF.fetch(
+      'http://test/api/weather?lat=59.9127&lon=10.7461&units=metric&name=Oslo&country=Norway',
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      hourly: Array<{
+        time: string;
+        temperature: number;
+        precipitationProbability: number | null;
+      }>;
+      daily: Array<{ date: string; uvIndexMax: number | null }>;
+    };
+    expect(body.hourly.map((h) => h.time)).toEqual(['2026-04-25T13:00', '2026-04-25T15:00']);
+    expect(body.hourly[1]?.precipitationProbability).toBeNull();
+    expect(body.daily.map((d) => d.date)).toEqual(['2026-04-25']);
+    expect(body.daily[0]?.uvIndexMax).toBeNull();
+  });
 });
 
-function sampleForecast() {
+interface ForecastFixture {
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  current: {
+    time: string;
+    temperature_2m: number;
+    apparent_temperature: number;
+    relative_humidity_2m: number;
+    weather_code: number;
+    is_day: number;
+    wind_speed_10m: number;
+    wind_direction_10m: number;
+    precipitation: number;
+    precipitation_probability: number;
+    cloud_cover: number;
+    pressure_msl: number;
+  };
+  // null entries are explicitly allowed so individual tests can exercise
+  // the upstream client's null-skipping branch.
+  hourly: {
+    time: string[];
+    temperature_2m: Array<number | null>;
+    precipitation_probability: Array<number | null>;
+    weather_code: Array<number | null>;
+  };
+  daily: {
+    time: string[];
+    weather_code: Array<number | null>;
+    temperature_2m_max: Array<number | null>;
+    temperature_2m_min: Array<number | null>;
+    apparent_temperature_max: Array<number | null>;
+    apparent_temperature_min: Array<number | null>;
+    sunrise: string[];
+    sunset: string[];
+    uv_index_max: Array<number | null>;
+    precipitation_sum: Array<number | null>;
+    precipitation_probability_max: Array<number | null>;
+    wind_speed_10m_max: Array<number | null>;
+    wind_direction_10m_dominant: Array<number | null>;
+  };
+}
+
+function sampleForecast(): ForecastFixture {
   return {
     latitude: 59.9127,
     longitude: 10.7461,

@@ -2,19 +2,22 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatTemperature, formatTime } from '../i18n/format';
-import type { Units, WeatherHourly, WeatherResponse } from '../lib/api/types';
+import type { Units, WeatherDaily, WeatherHourly, WeatherResponse } from '../lib/api/types';
 import { roundInt } from '../lib/units';
 import { WeatherIllustration } from './WeatherIllustration';
 
 /**
  * 24-hour strip — horizontally scrollable on mobile, single row on
- * desktop. Slicing is anchored to "now" rather than 00:00 of the
- * forecast day so the user sees the next 24h, not 1 AM yesterday.
+ * desktop. Slicing is anchored to "now in the location's timezone"
+ * so the user sees the next 24h regardless of where their browser
+ * is physically located (e.g. browsing Tokyo's forecast from Berlin
+ * still slices around Tokyo's clock time).
  *
- * Times come back from Open-Meteo without an explicit timezone
- * suffix (`2026-04-25T12:00`); we rely on `Intl.DateTimeFormat`'s
- * `timeZone` parameter and the location timezone to render local
- * clock-time regardless of where the visitor is.
+ * Open-Meteo returns timestamps as naive ISO strings (`2026-04-25T12:00`)
+ * that are *already in the location's timezone* (we set `timezone=auto`
+ * upstream). We exploit that by computing now's wall-clock parts in
+ * the same timezone and comparing strings directly — no `new Date()`
+ * round-trip to UTC required.
  */
 
 export interface HourlyForecastProps {
@@ -36,15 +39,15 @@ export function HourlyForecast({ weather, units, locale, now }: HourlyForecastPr
 
   const slice = useMemo<WeatherHourly[]>(() => {
     if (weather.hourly.length === 0) return [];
-    const reference = (now ?? new Date()).getTime();
-    // Open-Meteo timestamps are UTC-naive but "in the location's
-    // timezone". For slicing purposes we just compare against the
-    // payload's clock time — the user-facing label is rendered with
-    // `formatTime`, which does the locale conversion separately.
-    const startIdx = weather.hourly.findIndex((h) => new Date(h.time).getTime() >= reference);
+    const reference = floorToHourInTimezone(
+      now ?? new Date(),
+      weather.location.timezone,
+      weather.current.time,
+    );
+    const startIdx = weather.hourly.findIndex((h) => h.time >= reference);
     const safeStart = startIdx === -1 ? 0 : startIdx;
     return weather.hourly.slice(safeStart, safeStart + HOURS);
-  }, [weather.hourly, now]);
+  }, [weather, now]);
 
   if (slice.length === 0) return null;
 
@@ -57,14 +60,15 @@ export function HourlyForecast({ weather, units, locale, now }: HourlyForecastPr
         role="list"
         className="flex snap-x gap-3 overflow-x-auto rounded-2xl border border-border bg-surface p-3"
       >
-        {slice.map((hour, idx) => {
+        {slice.map((hour) => {
           const tempLabel = formatTemperature(hour.temperature, weather.units, locale);
           const timeLabel = formatTime(hour.time, locale, weather.location.timezone);
           const condition = t([`weather.code.${hour.weatherCode}`, 'weather.code.3']);
-          // Day/night hint: copy from the daily array if it covers
-          // this hour; otherwise pivot off the current isDay flag for
-          // hours within ~12h, defaulting to true.
-          const isDay = idx < 12 ? weather.current.isDay : !weather.current.isDay;
+          // Determine day/night by checking the slot's wall-clock time
+          // against the matching day's sunrise/sunset (also wall-clock
+          // in location TZ), so icons flip at real solar boundaries
+          // rather than at a fixed offset from `current.isDay`.
+          const isDay = isDayForSlot(hour.time, weather.daily, weather.current.isDay);
 
           return (
             <li
@@ -88,7 +92,7 @@ export function HourlyForecast({ weather, units, locale, now }: HourlyForecastPr
               >
                 {tempLabel}
               </span>
-              {hour.precipitationProbability > 10 ? (
+              {hour.precipitationProbability != null && hour.precipitationProbability > 10 ? (
                 <span className="text-[10px] text-muted">
                   {roundInt(hour.precipitationProbability)}%
                 </span>
@@ -99,4 +103,53 @@ export function HourlyForecast({ weather, units, locale, now }: HourlyForecastPr
       </ul>
     </section>
   );
+}
+
+/**
+ * Floor a JS `Date` to the start of its current hour, expressed as a
+ * naive ISO string (`YYYY-MM-DDTHH:00`) in the given IANA timezone.
+ * Falls back to the API's own `currentTime` (already in location TZ)
+ * if `Intl.DateTimeFormat` can't honor the timezone.
+ */
+function floorToHourInTimezone(at: Date, timeZone: string, currentTime: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(at);
+    const get = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((p) => p.type === type)?.value ?? '';
+    const yyyy = get('year');
+    const mm = get('month');
+    const dd = get('day');
+    const hh = get('hour');
+    if (yyyy && mm && dd && hh) {
+      // `hour: '2-digit'` with `hour12: false` returns "00".."23" in
+      // every modern engine — but Safari historically emitted "24"
+      // for midnight. Normalize that explicitly.
+      const safeHour = hh === '24' ? '00' : hh;
+      return `${yyyy}-${mm}-${dd}T${safeHour}:00`;
+    }
+  } catch {
+    // fall through
+  }
+  return `${currentTime.slice(0, 13)}:00`;
+}
+
+/**
+ * Decide whether `slotTime` falls between sunrise and sunset for its
+ * calendar day. If we don't have daily coverage for that day (e.g.
+ * far-future hours past the 7-day window), fall back to the
+ * caller-provided current isDay hint.
+ */
+function isDayForSlot(slotTime: string, daily: WeatherDaily[], fallbackIsDay: boolean): boolean {
+  const date = slotTime.slice(0, 10);
+  const day = daily.find((d) => d.date === date);
+  if (!day || !day.sunrise || !day.sunset) return fallbackIsDay;
+  return slotTime >= day.sunrise && slotTime < day.sunset;
 }

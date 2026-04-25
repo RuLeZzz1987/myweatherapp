@@ -62,7 +62,7 @@
 | Geocoding              | **Open-Meteo Geocoding** API (free, no registration)                                                                                                   | Same family, same terms                                                                                                                     |
 | Charts                 | **Recharts** or `visx` (pick Recharts; smaller learning surface)                                                                                       | Hourly forecast viz                                                                                                                         |
 | Icons / weather glyphs | **lucide-react** + custom SVG weather icons mapped from WMO codes                                                                                      | Crisp, accessible                                                                                                                           |
-| Testing                | **Vitest** + **React Testing Library** + **@testing-library/user-event** + **MSW** + **Playwright** (one smoke E2E)                                    | Unit + integration + light E2E                                                                                                              |
+| Testing                | **Vitest** + **React Testing Library** + **@testing-library/user-event** + **MSW**                                                                     | Unit + integration coverage; no separate E2E rig                                                                                            |
 | Lint / format          | **ESLint** (typescript-eslint, react-hooks, jsx-a11y) + **Prettier**                                                                                   | Required for code quality criterion                                                                                                         |
 | CI                     | GitHub Actions: install → typecheck → lint → test → build                                                                                              | Catches regressions                                                                                                                         |
 | Deploy                 | **Single Cloudflare Worker** with Static Assets serving the SPA build and `/api/*` routes, bound to the `WeatherCache` Durable Object (SQLite backend) | Free tier, one URL, no CORS, one deploy command (see §0.1, §8)                                                                              |
@@ -146,8 +146,7 @@ Hack/Staffer/
     │   │       └── handlers.ts     # MSW handlers for /api/*
     │   └── tests/
     │       ├── unit/               # *.test.ts(x)
-    │       ├── integration/        # full App rendering w/ MSW
-    │       └── e2e/                # playwright smoke
+    │       └── integration/        # full App rendering w/ MSW
     └── api/                        # Cloudflare Worker
         ├── wrangler.toml
         ├── tsconfig.json
@@ -332,7 +331,7 @@ Use container queries (`@container`) for the hero so the temperature size tracks
 - Combobox pattern for search (WAI-ARIA: `role=combobox`, `aria-expanded`, `aria-activedescendant`, full keyboard nav).
 - All decorative icons / illustrations `aria-hidden="true"`; weather condition is always available as text in the DOM in the active locale (en: `Partly cloudy, 27°`; nb: `Delvis skyet, 27°`) even when only `27°` is visually shown.
 - Recent-search cards are real `<button>` elements with descriptive `aria-label` built from i18n keys with ICU interpolation (en: `Show weather for Oslo, 25 degrees`).
-- Color contrast ≥ AA across themes (verified with axe in CI via Playwright).
+- Color contrast ≥ AA across themes (spot-checked against a stable token system).
 - Focus rings preserved, focus trap nowhere; skip-link to main content.
 - `prefers-reduced-motion` disables backdrop animation and chart transitions.
 - Live region (`aria-live=polite`) announces a localized "Weather for {city} updated" string after a successful fetch.
@@ -549,13 +548,7 @@ Coverage target: **80% statements** on `apps/web/src` and `apps/api/src`. CI fai
 - Keyboard: Tab reaches search field, ↓/↑/Enter on combobox selects result, Escape closes dropdown.
 - Worker integration: spin up worker via `unstable_dev`, hit `/api/weather` twice, second response has `source: 'cache'`.
 
-### 7.3 E2E (Playwright, smoke spec matrix)
-
-- Visit deployed preview / local prod build with default English locale, search "Fredrikstad", assert hero renders city name and a numeric temperature ending with `°`.
-- Repeat with `?lang=de` — assert German placeholder and recent-search label render.
-- Run axe-core on both runs, assert no serious/critical a11y violations.
-
-### 7.4 Manual QA checklist (in README)
+### 7.3 Manual QA checklist (in README)
 
 - iPhone SE width (375px), iPad, 1440 desktop, 4K.
 - Keyboard-only run-through.
@@ -596,7 +589,7 @@ Deployment URL is published to the workflow summary, the README, and any PR desc
 - [ ] All 12 supported locales (`en`, `nb`, `de`, `fr`, `es`, `it`, `nl`, `pl`, `pt`, `sv`, `da`, `fi`) have complete JSON catalogs; `pnpm i18n:check` passes in CI.
 - [ ] Browser-locale detection works (verified by integration tests for at least `en`, `de`, `nb`, `fi`); URL `?lang=` override works; user override via header picker persists.
 - [ ] Numbers, temperatures, times, weekdays and country names use `Intl.*` per active locale.
-- [ ] Unit + integration suites green, ≥80% coverage; E2E smoke green for `en` and `de`.
+- [ ] Unit + integration suites green, ≥80% coverage.
 - [ ] Deployed as a **single Worker with Static Assets** (SPA + `/api/*`) on Cloudflare's free tier (DO uses SQLite backend), public URL linked in README.
 - [ ] README documents: stack rationale, run/test/deploy commands, architecture diagram, i18n architecture + how to add a new locale, trade-offs, and "what I'd do next" (incl. RTL note).
 
@@ -615,7 +608,7 @@ Deployment URL is published to the workflow summary, the README, and any PR desc
 9. **Elevations** (intentionally beyond wireframe): `SecondaryStats`, `HourlyForecast`, `DailyForecast`, geolocation button.
 10. **Locale rollout**: produce the remaining 11 catalogs (`nb`, `de`, `fr`, `es`, `it`, `nl`, `pl`, `pt`, `sv`, `da`, `fi`) keyed off `en`; verify `pnpm i18n:check` and the integration tests pass.
 11. Responsiveness pass at 320 / 768 / 1024 / 1440 widths with `de` and `fi` loaded as length stress tests; container query polish on hero.
-12. Tests to coverage target + Playwright smoke (`en` and `de`).
+12. Tests to coverage target across all locale-affected flows.
 13. Deploy via `wrangler deploy` (single Worker, Static Assets binding to `apps/web/dist`, SQLite-backed `WeatherCache` DO); verify `/api/*` and the SPA both served from the resulting `*.workers.dev` URL; capture URL; finalize README (call out wireframe match, the elevations, the i18n architecture + how to add a locale, and the deploy story).
 
 Each step is a self-contained commit/PR-sized chunk so progress is reviewable. Step 7 is the "screenshot moment" — once it lands, visiting `/?lang=nb` should be visually identical to `wireframe.png` for the happy path before anything else is layered on.

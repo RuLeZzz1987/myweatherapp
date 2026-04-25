@@ -85,7 +85,10 @@ export function SecondaryStats({ weather, units, locale }: SecondaryStatsProps) 
     rows.push({
       key: 'uv',
       label: t('stats.uvIndex'),
-      value: roundInt(today.uvIndexMax).toString(),
+      // Open-Meteo returns null near the poles in winter / when the
+      // model has no UV signal — render an em-dash rather than a
+      // misleading "0".
+      value: today.uvIndexMax == null ? '—' : roundInt(today.uvIndexMax).toString(),
     });
     rows.push({
       key: 'sunrise',

@@ -210,28 +210,54 @@ export async function forecast(
     isDay: parsed.current.is_day === 1,
   };
 
-  const hourly: WeatherHourly[] = parsed.hourly.time.map((time, i) => ({
-    time,
-    temperature: numberAt(parsed.hourly.temperature_2m, i),
-    precipitationProbability: numberAt(parsed.hourly.precipitation_probability, i),
-    weatherCode: numberAt(parsed.hourly.weather_code, i),
-  }));
+  // Open-Meteo can null individual indices when a model lacks data for a
+  // given hour/day. We refuse to invent numbers (zero would render
+  // confidently as "0°C" / "0 mm" — see SPEC §4.3 "no fabrication").
+  // Strategy:
+  //   - If the *anchor* metric (hourly: temperature, daily: tempMax/Min)
+  //     is null we drop the slot entirely.
+  //   - Optional metrics that legitimately go null (probability, UV)
+  //     surface as `null` and are rendered as "—" by the UI.
+  //   - Remaining gaps fall back to a sibling metric (e.g. apparentTemp
+  //     -> temp) or a sane neutral default with a comment.
+  const hourly: WeatherHourly[] = parsed.hourly.time.flatMap((time, i) => {
+    const temp = parsed.hourly.temperature_2m[i];
+    if (temp == null) return [];
+    const code = parsed.hourly.weather_code[i];
+    const slot: WeatherHourly = {
+      time,
+      temperature: temp,
+      precipitationProbability: parsed.hourly.precipitation_probability[i] ?? null,
+      // Code 3 ("overcast") is the least-misleading neutral when the
+      // upstream model omits a code — it doesn't imply any active
+      // precipitation or extreme condition.
+      weatherCode: code ?? 3,
+    };
+    return [slot];
+  });
 
-  const daily: WeatherDaily[] = parsed.daily.time.map((date, i) => ({
-    date,
-    weatherCode: numberAt(parsed.daily.weather_code, i),
-    tempMax: numberAt(parsed.daily.temperature_2m_max, i),
-    tempMin: numberAt(parsed.daily.temperature_2m_min, i),
-    apparentTempMax: numberAt(parsed.daily.apparent_temperature_max, i),
-    apparentTempMin: numberAt(parsed.daily.apparent_temperature_min, i),
-    sunrise: parsed.daily.sunrise[i] ?? '',
-    sunset: parsed.daily.sunset[i] ?? '',
-    uvIndexMax: numberAt(parsed.daily.uv_index_max, i),
-    precipitationSum: numberAt(parsed.daily.precipitation_sum, i),
-    precipitationProbabilityMax: numberAt(parsed.daily.precipitation_probability_max, i),
-    windSpeedMax: numberAt(parsed.daily.wind_speed_10m_max, i),
-    windDirectionDominant: numberAt(parsed.daily.wind_direction_10m_dominant, i),
-  }));
+  const daily: WeatherDaily[] = parsed.daily.time.flatMap((date, i) => {
+    const tmax = parsed.daily.temperature_2m_max[i];
+    const tmin = parsed.daily.temperature_2m_min[i];
+    if (tmax == null || tmin == null) return [];
+    const code = parsed.daily.weather_code[i];
+    const slot: WeatherDaily = {
+      date,
+      weatherCode: code ?? 3,
+      tempMax: tmax,
+      tempMin: tmin,
+      apparentTempMax: parsed.daily.apparent_temperature_max[i] ?? tmax,
+      apparentTempMin: parsed.daily.apparent_temperature_min[i] ?? tmin,
+      sunrise: parsed.daily.sunrise[i] ?? '',
+      sunset: parsed.daily.sunset[i] ?? '',
+      uvIndexMax: parsed.daily.uv_index_max[i] ?? null,
+      precipitationSum: parsed.daily.precipitation_sum[i] ?? 0,
+      precipitationProbabilityMax: parsed.daily.precipitation_probability_max[i] ?? null,
+      windSpeedMax: parsed.daily.wind_speed_10m_max[i] ?? 0,
+      windDirectionDominant: parsed.daily.wind_direction_10m_dominant[i] ?? 0,
+    };
+    return [slot];
+  });
 
   return {
     location: {
@@ -252,16 +278,6 @@ export async function forecast(
 // ---------------------------------------------------------------------------
 // Internals
 // ---------------------------------------------------------------------------
-
-function numberAt(arr: Array<number | null>, i: number): number {
-  const v = arr[i];
-  // Open-Meteo can null-out individual indices when a model lacks data; treat
-  // that as 0 for now (UI can still render). Real "no data" handling is per
-  // upstream guidance: missing slots should be skipped, not zeroed. We round
-  // to defaults rather than throw because a single null hour shouldn't sink
-  // the whole response.
-  return v ?? 0;
-}
 
 function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));

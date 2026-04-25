@@ -45,23 +45,33 @@ export interface WeatherCurrent {
 
 export interface WeatherHourly {
   time: string;
+  /** Anchor field — entries with a null upstream temperature are dropped. */
   temperature: number;
-  precipitationProbability: number;
+  /**
+   * Open-Meteo can null this out when the precipitation model lacks
+   * coverage. UI should render "—" or hide the badge rather than
+   * displaying 0%.
+   */
+  precipitationProbability: number | null;
   weatherCode: number;
 }
 
 export interface WeatherDaily {
   date: string;
   weatherCode: number;
+  /** Anchor — entries with null max OR min are dropped. */
   tempMax: number;
+  /** Anchor — entries with null max OR min are dropped. */
   tempMin: number;
   apparentTempMax: number;
   apparentTempMin: number;
   sunrise: string;
   sunset: string;
-  uvIndexMax: number;
+  /** Null near the poles in winter / when the model has no UV signal. */
+  uvIndexMax: number | null;
   precipitationSum: number;
-  precipitationProbabilityMax: number;
+  /** Null when the model lacks precipitation coverage for the day. */
+  precipitationProbabilityMax: number | null;
   windSpeedMax: number;
   windDirectionDominant: number;
 }

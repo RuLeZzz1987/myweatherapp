@@ -125,8 +125,8 @@ export function CurrentWeatherHero({
 
         {/* When the user toggles units, the previous payload sticks
             around (TanStack `placeholderData: keepPreviousData`) until
-            the new one lands — `data-units-mismatch` lets E2E /
-            integration tests assert the transitional state without
+            the new one lands — `data-units-mismatch` lets integration
+            tests assert the transitional state without
             adding a visible string. */}
         <span hidden data-units-mismatch={unitsMismatch} />
       </article>

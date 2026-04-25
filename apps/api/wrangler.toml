@@ -2,7 +2,9 @@ name = "myweather"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
-account_id = "REDACTED_ACCOUNT_ID"
+# Account ID is provided at deploy time via the CLOUDFLARE_ACCOUNT_ID env
+# var (set as a GitHub Actions secret). We deliberately do not commit it
+# here — see SPEC §10 "Secrets & deploy".
 
 # Serve the SPA build directly from this Worker. Routes that don't match
 # /api/* fall through to the static assets (with SPA fallback to index.html
