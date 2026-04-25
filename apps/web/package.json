@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc -b --noEmit",
-    "test": "echo 'vitest wired in step 5' && exit 0",
-    "test:watch": "echo 'vitest wired in step 5' && exit 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "i18n:check": "node scripts/i18n-check.mjs"
   },
   "dependencies": {

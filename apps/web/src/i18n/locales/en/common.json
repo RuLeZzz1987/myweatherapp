@@ -1,0 +1,42 @@
+{
+  "brand": "MyWeather",
+  "app": {
+    "greeting": "Welcome to MyWeather",
+    "tagline": "Personalized weather, in your language."
+  },
+  "header": {
+    "searchPlaceholder": "Search for a city",
+    "languageLabel": "Language",
+    "unit": {
+      "metric": "°C",
+      "imperial": "°F"
+    }
+  },
+  "empty": {
+    "prompt": "Search for a city to see the weather",
+    "useLocation": "Use my location"
+  },
+  "recents": {
+    "title": "Recent searches",
+    "cardLabel": "Show weather for {{city}}, {{temp}} degrees"
+  },
+  "weather": {
+    "feelsLike": "Feels like {{temp}}",
+    "code": {
+      "0": "Clear sky",
+      "61": "Light rain"
+    }
+  },
+  "errors": {
+    "fetchFailed": "Couldn't load the weather. Try again."
+  },
+  "states": {
+    "offline": "You're offline"
+  },
+  "liveRegion": {
+    "updated": "Weather for {{city}} updated"
+  },
+  "footer": {
+    "attribution": "Weather data by Open-Meteo"
+  }
+}
