@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Det gick inte att läsa in vädret.",
     "retry": "Försök igen",
-    "offlineHint": "Kontrollera anslutningen och försök igen."
+    "offlineHint": "Kontrollera anslutningen och försök igen.",
+    "appCrashTitle": "Något gick fel.",
+    "appCrashBody": "MyWeather råkade ut för ett oväntat problem. Att ladda om brukar lösa det.",
+    "appCrashReload": "Ladda om"
   },
   "states": {
     "offline": "Du är offline. Visar senaste cachade data."

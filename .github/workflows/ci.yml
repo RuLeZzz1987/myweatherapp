@@ -81,6 +81,13 @@ jobs:
 
       - name: Build SPA (worker reads dist)
         run: pnpm --filter @myweather/web run build
+        env:
+          # Public Sentry DSN — embedded in the client bundle by Vite at
+          # build time. Stored as a repo *variable* (not a secret) because
+          # the DSN is meant to ship in client code; Sentry rate-limits
+          # per-project regardless. Empty value = boundary stays a pure
+          # client-side fallback (see lib/sentry.ts).
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
 
       - name: Deploy worker
         run: pnpm --filter @myweather/api run deploy

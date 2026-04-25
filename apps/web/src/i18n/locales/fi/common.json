@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Säätä ei voitu ladata.",
     "retry": "Yritä uudelleen",
-    "offlineHint": "Tarkista yhteytesi ja yritä uudelleen."
+    "offlineHint": "Tarkista yhteytesi ja yritä uudelleen.",
+    "appCrashTitle": "Jokin meni pieleen.",
+    "appCrashBody": "MyWeather kohtasi odottamattoman ongelman. Sivun lataaminen uudelleen yleensä korjaa sen.",
+    "appCrashReload": "Lataa uudelleen"
   },
   "states": {
     "offline": "Olet offline-tilassa. Näytetään viimeisimmät välimuistitiedot."

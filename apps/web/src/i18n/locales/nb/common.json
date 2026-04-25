@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Kunne ikke laste været.",
     "retry": "Prøv igjen",
-    "offlineHint": "Sjekk tilkoblingen din og prøv igjen."
+    "offlineHint": "Sjekk tilkoblingen din og prøv igjen.",
+    "appCrashTitle": "Noe gikk galt.",
+    "appCrashBody": "MyWeather fikk et uventet problem. Det hjelper som regel å laste på nytt.",
+    "appCrashReload": "Last på nytt"
   },
   "states": {
     "offline": "Du er frakoblet. Viser de siste bufrede dataene."

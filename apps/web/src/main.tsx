@@ -5,7 +5,11 @@ import { createRoot } from 'react-dom/client';
 import './i18n';
 import './index.css';
 import App from './App.tsx';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
 import { createQueryClient } from './lib/queryClient';
+import { initSentry } from './lib/sentry';
+
+initSentry();
 
 const rootEl = document.getElementById('root');
 if (!rootEl) {
@@ -16,8 +20,10 @@ const queryClient = createQueryClient();
 
 createRoot(rootEl).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <AppErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </AppErrorBoundary>
   </StrictMode>,
 );

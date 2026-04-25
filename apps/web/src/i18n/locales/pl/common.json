@@ -123,7 +123,10 @@
   "errors": {
     "fetchFailed": "Nie udało się wczytać pogody.",
     "retry": "Spróbuj ponownie",
-    "offlineHint": "Sprawdź połączenie i spróbuj ponownie."
+    "offlineHint": "Sprawdź połączenie i spróbuj ponownie.",
+    "appCrashTitle": "Coś poszło nie tak.",
+    "appCrashBody": "MyWeather napotkał nieoczekiwany problem. Przeładowanie zwykle to naprawia.",
+    "appCrashReload": "Przeładuj"
   },
   "states": {
     "offline": "Jesteś offline. Wyświetlam ostatnie zapisane dane."

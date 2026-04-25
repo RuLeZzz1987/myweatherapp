@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Couldn't load the weather.",
     "retry": "Try again",
-    "offlineHint": "Check your connection and try again."
+    "offlineHint": "Check your connection and try again.",
+    "appCrashTitle": "Something went wrong.",
+    "appCrashBody": "MyWeather hit an unexpected problem. Reloading usually fixes it.",
+    "appCrashReload": "Reload"
   },
   "states": {
     "offline": "You're offline. Showing the latest cached data."

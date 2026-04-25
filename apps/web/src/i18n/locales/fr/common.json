@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Impossible de charger la météo.",
     "retry": "Réessayer",
-    "offlineHint": "Vérifiez votre connexion et réessayez."
+    "offlineHint": "Vérifiez votre connexion et réessayez.",
+    "appCrashTitle": "Une erreur s'est produite.",
+    "appCrashBody": "MyWeather a rencontré un problème inattendu. Recharger résout généralement le problème.",
+    "appCrashReload": "Recharger"
   },
   "states": {
     "offline": "Vous êtes hors ligne. Affichage des dernières données en cache."

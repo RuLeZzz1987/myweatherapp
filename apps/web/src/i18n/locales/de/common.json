@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Wetter konnte nicht geladen werden.",
     "retry": "Erneut versuchen",
-    "offlineHint": "Prüfe deine Verbindung und versuche es erneut."
+    "offlineHint": "Prüfe deine Verbindung und versuche es erneut.",
+    "appCrashTitle": "Etwas ist schiefgelaufen.",
+    "appCrashBody": "MyWeather hatte ein unerwartetes Problem. Neu laden behebt es meistens.",
+    "appCrashReload": "Neu laden"
   },
   "states": {
     "offline": "Du bist offline. Es werden die zuletzt zwischengespeicherten Daten angezeigt."

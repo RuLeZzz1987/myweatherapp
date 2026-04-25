@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Kan het weer niet laden.",
     "retry": "Opnieuw proberen",
-    "offlineHint": "Controleer je verbinding en probeer het opnieuw."
+    "offlineHint": "Controleer je verbinding en probeer het opnieuw.",
+    "appCrashTitle": "Er is iets misgegaan.",
+    "appCrashBody": "MyWeather kreeg een onverwacht probleem. Opnieuw laden lost het meestal op.",
+    "appCrashReload": "Opnieuw laden"
   },
   "states": {
     "offline": "Je bent offline. Laatste cachegegevens worden getoond."

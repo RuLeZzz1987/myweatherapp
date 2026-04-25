@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Impossibile caricare il meteo.",
     "retry": "Riprova",
-    "offlineHint": "Controlla la connessione e riprova."
+    "offlineHint": "Controlla la connessione e riprova.",
+    "appCrashTitle": "Qualcosa è andato storto.",
+    "appCrashBody": "MyWeather ha riscontrato un problema imprevisto. Ricaricare di solito lo risolve.",
+    "appCrashReload": "Ricarica"
   },
   "states": {
     "offline": "Sei offline. Mostro gli ultimi dati in cache."

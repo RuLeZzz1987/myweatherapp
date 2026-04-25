@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "Kunne ikke indlæse vejret.",
     "retry": "Prøv igen",
-    "offlineHint": "Tjek din forbindelse og prøv igen."
+    "offlineHint": "Tjek din forbindelse og prøv igen.",
+    "appCrashTitle": "Noget gik galt.",
+    "appCrashBody": "MyWeather stødte på et uventet problem. At genindlæse løser det som regel.",
+    "appCrashReload": "Genindlæs"
   },
   "states": {
     "offline": "Du er offline. Viser de seneste cachelagrede data."

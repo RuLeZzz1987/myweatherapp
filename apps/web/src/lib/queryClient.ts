@@ -1,6 +1,7 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryCache, QueryClient } from '@tanstack/react-query';
 
 import { ApiError } from './api/client';
+import { reportQueryError } from './sentry';
 
 /**
  * Single TanStack Query client for the whole app — see SPEC.md §5.3.
@@ -16,9 +17,20 @@ import { ApiError } from './api/client';
  *     without an explicit reload.
  *   - 4xx errors are NOT retried (a bad query won't get better with a
  *     retry); transient 5xx / network errors get one retry.
+ *   - 5xx / network errors after retries exhaust are forwarded to Sentry
+ *     via `reportQueryError` (no-op when `VITE_SENTRY_DSN` is unset).
  */
 export function createQueryClient(): QueryClient {
+  const queryCache = new QueryCache({
+    onError: (error, query) => {
+      const area = inferArea(query.queryKey);
+      if (!area) return;
+      reportQueryError(error, { area, queryKey: query.queryKey });
+    },
+  });
+
   return new QueryClient({
+    queryCache,
     defaultOptions: {
       queries: {
         staleTime: 60_000,
@@ -33,4 +45,11 @@ export function createQueryClient(): QueryClient {
       },
     },
   });
+}
+
+function inferArea(queryKey: readonly unknown[]): 'weather' | 'geocode' | null {
+  const head = queryKey[0];
+  if (head === 'weather') return 'weather';
+  if (head === 'geocode') return 'geocode';
+  return null;
 }

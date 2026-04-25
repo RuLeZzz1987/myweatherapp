@@ -121,7 +121,10 @@
   "errors": {
     "fetchFailed": "No se pudo cargar el tiempo.",
     "retry": "Reintentar",
-    "offlineHint": "Comprueba tu conexión e inténtalo de nuevo."
+    "offlineHint": "Comprueba tu conexión e inténtalo de nuevo.",
+    "appCrashTitle": "Algo salió mal.",
+    "appCrashBody": "MyWeather encontró un problema inesperado. Recargar suele solucionarlo.",
+    "appCrashReload": "Recargar"
   },
   "states": {
     "offline": "Estás sin conexión. Mostrando los últimos datos en caché."
