@@ -187,6 +187,11 @@ export class WeatherCache implements DurableObject {
     const sql = this.state.storage.sql;
 
     if (typeof prefix === 'string' && prefix.length > 0) {
+      // Internal-only endpoint; the only callers in this repo pass
+      // literal prefixes like `wx:` or `geo:` that don't contain LIKE
+      // metacharacters (`%`, `_`). The `?` parameter binding prevents
+      // SQL injection regardless. If we ever expose this externally
+      // we'd need to escape LIKE wildcards explicitly.
       sql.exec('DELETE FROM entries WHERE key LIKE ?', `${prefix}%`);
     } else {
       sql.exec('DELETE FROM entries');
@@ -250,10 +255,7 @@ export class WeatherCache implements DurableObject {
   // ---------------- internals
 
   /** Single source of truth for upstream calls. */
-  private async runUpstream(
-    req: CoalesceRequest,
-    stalePayload: unknown,
-  ): Promise<CoalesceResult> {
+  private async runUpstream(req: CoalesceRequest, stalePayload: unknown): Promise<CoalesceResult> {
     try {
       const payload =
         req.kind === 'weather'

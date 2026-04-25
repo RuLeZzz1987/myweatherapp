@@ -66,7 +66,11 @@ function applySecurityHeaders(res: Response): Response {
 }
 
 const api = new Hono<{ Bindings: Env }>()
-  .get('/health', (c) => c.json({ ok: true, version: VERSION, env: c.env.APP_ENV }))
+  // /health intentionally only exposes the build version. We used to
+  // include `env: APP_ENV` here, but a public health probe is the wrong
+  // place to leak runtime metadata — `wrangler tail` and the dashboard
+  // already cover internal observability.
+  .get('/health', (c) => c.json({ ok: true, version: VERSION }))
   .route('/geocode', geocodeRoute)
   .route('/weather', weatherRoute)
   .notFound((c) => c.json({ error: 'not_found' }, 404))

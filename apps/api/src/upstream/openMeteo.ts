@@ -84,6 +84,11 @@ export async function geocode(q: string, options: GeocodeOptions = {}): Promise<
 
 const NumArr = z.array(z.number().nullable());
 const StrArr = z.array(z.string());
+// Open-Meteo legitimately returns `null` entries in `daily.sunrise` /
+// `daily.sunset` during polar night / polar day at high latitudes
+// (e.g. Tromsø in January — well within our supported coverage area).
+// The mapper collapses null to '' so the UI can render "—".
+const NullableStrArr = z.array(z.string().nullable());
 
 const ForecastUpstreamSchema = z.object({
   latitude: z.number(),
@@ -116,8 +121,8 @@ const ForecastUpstreamSchema = z.object({
     temperature_2m_min: NumArr,
     apparent_temperature_max: NumArr,
     apparent_temperature_min: NumArr,
-    sunrise: StrArr,
-    sunset: StrArr,
+    sunrise: NullableStrArr,
+    sunset: NullableStrArr,
     uv_index_max: NumArr,
     precipitation_sum: NumArr,
     precipitation_probability_max: NumArr,
@@ -293,7 +298,14 @@ async function fetchJson(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
   const onAbort = () => controller.abort();
-  options.signal?.addEventListener('abort', onAbort, { once: true });
+  // If the upstream signal is *already* aborted by the time we get here,
+  // the 'abort' event has already fired and addEventListener will never
+  // notify us — propagate the abort eagerly instead.
+  if (options.signal?.aborted) {
+    controller.abort();
+  } else {
+    options.signal?.addEventListener('abort', onAbort, { once: true });
+  }
 
   try {
     const res = await fetcher(url.toString(), { signal: controller.signal });

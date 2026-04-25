@@ -211,6 +211,20 @@ describe('GET /api/weather', () => {
     expect(upstreamCalls).toBe(1);
   });
 
+  it('accepts requests without `name` (deep-link path)', async () => {
+    // Regression for H-1: an earlier schema rejected an empty/missing
+    // `name` query string with a 400, breaking deep links of the form
+    // `/?lat=...&lon=...` with no geocoder label attached.
+    mockFetch(
+      (url) => url.startsWith(FORECAST_URL),
+      () => jsonReply(200, sampleForecast()),
+    );
+    const res = await SELF.fetch('http://test/api/weather?lat=59.9127&lon=10.7461&units=metric');
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { location: { name: string } };
+    expect(body.location.name).toBe('');
+  });
+
   it('returns 502 when upstream fails and there is no cache', async () => {
     mockFetch(
       (url) => url.startsWith(FORECAST_URL),

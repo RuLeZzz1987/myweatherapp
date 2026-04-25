@@ -32,16 +32,25 @@ import { join, resolve } from 'node:path';
  * URL).
  */
 const ALLOW_SAME_AS_SOURCE = new Set([
-  'brand',
+  // The brand key is a JSON file under `common/`, so flattened it's
+  // `common.brand`. The bare `brand` form has no flattened analogue —
+  // dropping it.
   'common.brand',
-  // Cognates that legitimately match across languages.
-  'common.stats.wind', // de, nl: "Wind"
-  'common.stats.title', // fr: "Conditions"
-  'common.header.unit.metric',
-  'common.header.unit.imperial',
-  'common.stats.unit.kmh',
-  'common.stats.unit.mph',
-  'common.stats.unit.mm',
+  // Cognates that legitimately match across languages. Annotate each
+  // entry with the locale(s) it covers so the next reader (and the
+  // next round of locale rollout) doesn't have to re-discover it.
+  'common.stats.wind', // de "Wind", nl "Wind"
+  'common.stats.title', // fr "Conditions"
+  // Unit symbols are language-agnostic by convention — every locale
+  // uses the SI (or US imperial) glyph as-is.
+  'common.header.unit.metric', // unit glyph
+  'common.header.unit.imperial', // unit glyph
+  'common.stats.unit.kmh', // unit glyph
+  'common.stats.unit.mph', // unit glyph
+  'common.stats.unit.mm', // unit glyph
+  // 8-point compass cardinals: every supported locale (en/de/nl/sv/no/
+  // fi/da) uses the same "N/NE/E/SE/S/SW/W/NW" letter glyphs in their
+  // weather UIs. fr/es/it/pt/pl don't translate these either.
   'common.stats.windDir.N',
   'common.stats.windDir.NE',
   'common.stats.windDir.E',
@@ -50,6 +59,7 @@ const ALLOW_SAME_AS_SOURCE = new Set([
   'common.stats.windDir.SW',
   'common.stats.windDir.W',
   'common.stats.windDir.NW',
+  // External URL — same regardless of locale.
   'common.footer.attributionLink',
   'footer.attributionLink',
 ]);
@@ -125,9 +135,21 @@ function safeReaddir(p) {
 
 function catalogFor(root, lang) {
   const dir = join(root, lang);
-  if (!statSync(dir).isDirectory()) return null;
+  // statSync throws ENOENT if the entry has gone away between the
+  // outer readdir() and us getting here — rare but not impossible in
+  // CI sandboxes that mutate the tree concurrently. Treat any stat
+  // failure (or non-directory entry such as a stray .DS_Store file)
+  // as "not a locale" rather than crashing the whole check.
+  let stat;
+  try {
+    stat = statSync(dir);
+  } catch {
+    return null;
+  }
+  if (!stat.isDirectory()) return null;
+  const entries = safeReaddir(dir) ?? [];
   const merged = {};
-  for (const file of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
+  for (const file of entries.filter((f) => f.endsWith('.json'))) {
     const ns = file.replace(/\.json$/, '');
     merged[ns] = JSON.parse(readFileSync(join(dir, file), 'utf8'));
   }

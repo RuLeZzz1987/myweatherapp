@@ -12,7 +12,13 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 // @ts-expect-error -- plain ESM script, no .d.ts.
-import { runI18nCheck, baseKey, isPluralVariant, isFormatOnly, flatten } from '../../../scripts/i18n-check.mjs';
+import {
+  runI18nCheck,
+  baseKey,
+  isPluralVariant,
+  isFormatOnly,
+  flatten,
+} from '../../../scripts/i18n-check.mjs';
 
 interface Logs {
   warn: string[];
@@ -20,7 +26,10 @@ interface Logs {
   info: string[];
 }
 
-function makeLog(): { log: { warn: (s: string) => void; error: (s: string) => void; info: (s: string) => void }; logs: Logs } {
+function makeLog(): {
+  log: { warn: (s: string) => void; error: (s: string) => void; info: (s: string) => void };
+  logs: Logs;
+} {
   const logs: Logs = { warn: [], error: [], info: [] };
   return {
     logs,

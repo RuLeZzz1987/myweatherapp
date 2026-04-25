@@ -63,7 +63,11 @@ export const geocodeRoute = new Hono<{ Bindings: Env }>().get('/', async (c) => 
     params: {
       q: qNormalized,
       limit,
-      ...(language !== undefined ? { language } : {}),
+      // Forward the lowercased subtag so the cache key and the upstream
+      // request agree byte-for-byte. Open-Meteo accepts mixed case but
+      // we'd rather not have two clients with `language=FR` vs `fr`
+      // coalesce on the cache key while sending different upstream URLs.
+      ...(language !== undefined ? { language: lang } : {}),
     },
   });
 

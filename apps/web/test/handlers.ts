@@ -151,24 +151,33 @@ function buildWeather(
       precipitationProbability: sparseOptionals && i % 3 === 0 ? null : i % 4 === 0 ? 30 : 0,
       weatherCode: seed.metric.weatherCode,
     })),
-    daily: Array.from({ length: 7 }).map((_, i) => ({
-      date: `2026-04-${String(25 + i).padStart(2, '0')}`,
-      weatherCode: seed.metric.weatherCode,
-      tempMax,
-      tempMin,
-      apparentTempMax: tempMax - 1,
-      apparentTempMin: tempMin - 1,
-      sunrise: `2026-04-${String(25 + i).padStart(2, '0')}T05:30`,
-      sunset: `2026-04-${String(25 + i).padStart(2, '0')}T20:45`,
-      // Day 0 (today) gets a null UV index under sparseOptionals so the
-      // SecondaryStats em-dash branch is reachable from the integration
-      // path; the remaining days still carry numeric values.
-      uvIndexMax: sparseOptionals && i === 0 ? null : 4,
-      precipitationSum: 0,
-      precipitationProbabilityMax: sparseOptionals && i === 0 ? null : 20,
-      windSpeedMax: units === 'metric' ? 18 : 11,
-      windDirectionDominant: 220,
-    })),
+    daily: Array.from({ length: 7 }).map((_, i) => {
+      // Use real Date arithmetic so the 7-day window correctly spans a
+      // month boundary (April only has 30 days, so 25..31 is invalid).
+      // toISOString().slice(0, 10) gives the YYYY-MM-DD form used by
+      // Open-Meteo and consumed by Intl.DateTimeFormat in the UI.
+      const date = new Date('2026-04-25T00:00:00Z');
+      date.setUTCDate(date.getUTCDate() + i);
+      const day = date.toISOString().slice(0, 10);
+      return {
+        date: day,
+        weatherCode: seed.metric.weatherCode,
+        tempMax,
+        tempMin,
+        apparentTempMax: tempMax - 1,
+        apparentTempMin: tempMin - 1,
+        sunrise: `${day}T05:30`,
+        sunset: `${day}T20:45`,
+        // Day 0 (today) gets a null UV index under sparseOptionals so the
+        // SecondaryStats em-dash branch is reachable from the integration
+        // path; the remaining days still carry numeric values.
+        uvIndexMax: sparseOptionals && i === 0 ? null : 4,
+        precipitationSum: 0,
+        precipitationProbabilityMax: sparseOptionals && i === 0 ? null : 20,
+        windSpeedMax: units === 'metric' ? 18 : 11,
+        windDirectionDominant: 220,
+      };
+    }),
     fetchedAt: new Date('2026-04-25T12:00:00Z').toISOString(),
     source: 'upstream',
     attribution: 'Open-Meteo',

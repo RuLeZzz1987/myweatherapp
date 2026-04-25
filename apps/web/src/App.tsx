@@ -211,6 +211,13 @@ function inferGeocodeFromSelectionAndWeather(
   selection: UrlSelection,
   weather: WeatherResponse,
 ): GeocodeResult | null {
+  // Known limitation (acceptable for a portfolio app): when the URL
+  // lacks a real geocoder ID we fall back to a coordinate-derived
+  // synthetic ID. If the user later searches for the same city through
+  // the search box, the genuine `geocoder.id` won't match this synthetic
+  // one, and they'll briefly see two strip entries for the same place.
+  // A real fix would round-trip through the geocoder on URL bootstrap;
+  // not worth the extra request for this app.
   const id =
     selection.id ??
     `${weather.location.latitude.toFixed(4)}:${weather.location.longitude.toFixed(4)}`;

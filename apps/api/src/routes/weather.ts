@@ -27,7 +27,11 @@ const Query = z.object({
   lat: z.coerce.number().min(-90).max(90),
   lon: z.coerce.number().min(-180).max(180),
   units: z.enum(['metric', 'imperial']).default('metric'),
-  name: z.string().trim().min(1).max(120).default(''),
+  // `name`/`country` are best-effort labels the SPA forwards from the
+  // geocoder. They MUST be optional (empty string allowed) so deep links
+  // like `/?lat=51.5&lon=-0.1` still resolve weather without a 400 — the
+  // upstream + UI both gracefully fall back to coordinates when missing.
+  name: z.string().trim().max(120).default(''),
   country: z.string().trim().max(120).default(''),
 });
 
