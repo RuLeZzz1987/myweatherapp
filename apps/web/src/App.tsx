@@ -5,7 +5,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AppHeader } from './components/AppHeader';
 import { AttributionFooter } from './components/AttributionFooter';
 import { CurrentWeatherHero } from './components/CurrentWeatherHero';
+import { DailyForecast } from './components/DailyForecast';
+import { HourlyForecast } from './components/HourlyForecast';
 import { RecentSearches, type RecentCardSnapshot } from './components/RecentSearches';
+import { SecondaryStats } from './components/SecondaryStats';
 import { useWeather } from './hooks/useWeather';
 import { selectionFromGeocode, useUrlSelection, type UrlSelection } from './hooks/useUrlSelection';
 import type { GeocodeResult, WeatherResponse } from './lib/api/types';
@@ -120,11 +123,16 @@ function App() {
 
         <section className="flex flex-1 flex-col gap-8">
           {weatherQuery.data ? (
-            <CurrentWeatherHero
-              weather={weatherQuery.data}
-              locale={locale}
-              preferredUnits={units}
-            />
+            <>
+              <CurrentWeatherHero
+                weather={weatherQuery.data}
+                locale={locale}
+                preferredUnits={units}
+              />
+              <SecondaryStats weather={weatherQuery.data} units={units} locale={locale} />
+              <HourlyForecast weather={weatherQuery.data} units={units} locale={locale} />
+              <DailyForecast weather={weatherQuery.data} units={units} locale={locale} />
+            </>
           ) : selection ? (
             <div
               role="status"
