@@ -1,6 +1,7 @@
 /**
- * Integration test for the step-5 placeholder App — confirms the i18n stack
- * is wired end-to-end:
+ * Integration test for the §10 step 6b App shell — confirms i18n and the
+ * frontend-shell wiring (AppHeader + SearchBar + LanguagePicker +
+ * UnitsToggle) hang together end-to-end.
  *
  *   - Side-effecting import of `./i18n` initializes i18next before render
  *   - Strings come from `react-i18next`'s `t()`
@@ -8,27 +9,37 @@
  *   - The language picker persists the user's choice to localStorage
  *
  * Browser-locale autodetection is exercised at the helper level
- * (see `bestMatch.test.ts`); this file focuses on the React surface.
+ * (`bestMatch.test.ts`); this file focuses on the React surface.
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import App from './App';
 import i18n, { STORAGE_KEY } from './i18n';
+import { PREFS_STORAGE_KEY, usePrefs } from './store/prefs';
+import { renderWithProviders } from '../test/render';
+
+function getLanguagePicker() {
+  return screen.getByRole('combobox', { name: 'Language' });
+}
 
 describe('<App />', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en');
+    usePrefs.setState({ units: 'metric', languageOverride: null });
+    localStorage.removeItem(PREFS_STORAGE_KEY);
   });
 
   afterEach(async () => {
     await i18n.changeLanguage('en');
+    usePrefs.setState({ units: 'metric', languageOverride: null });
+    localStorage.removeItem(PREFS_STORAGE_KEY);
   });
 
   it('renders the brand and English copy by default', () => {
-    render(<App />);
+    renderWithProviders(<App />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'MyWeather' })).toBeInTheDocument();
     expect(screen.getByText('Welcome to MyWeather')).toBeInTheDocument();
@@ -36,8 +47,16 @@ describe('<App />', () => {
     expect(screen.getByText('Search for a city to see the weather')).toBeInTheDocument();
   });
 
+  it('renders both header controls and the search combobox', () => {
+    renderWithProviders(<App />);
+
+    expect(getLanguagePicker()).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Search for a city' })).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'Units' })).toBeInTheDocument();
+  });
+
   it('keeps <html lang> in sync with the active language', async () => {
-    render(<App />);
+    renderWithProviders(<App />);
     expect(document.documentElement.lang).toBe('en');
 
     await i18n.changeLanguage('de');
@@ -46,26 +65,26 @@ describe('<App />', () => {
 
   it('switches the active language when the user picks a different option', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderWithProviders(<App />);
 
-    expect(screen.getByRole('combobox')).toHaveValue('en');
-
-    await user.selectOptions(screen.getByRole('combobox'), 'de');
+    expect(getLanguagePicker()).toHaveValue('en');
+    await user.selectOptions(getLanguagePicker(), 'de');
 
     // German catalog isn't shipped yet, so visible strings still fall back
-    // to the en bundle — but the active language switched and `<html lang>`
-    // updated, which is the contract this test asserts. Per-locale strings
-    // are verified once catalogs land in §10 step 10.
+    // to en — but the active language switched, `<html lang>` updated, and
+    // the prefs slice recorded the override (vs auto-detection). Per-locale
+    // strings are verified once catalogs land in §10 step 10.
     await waitFor(() => {
       expect(i18n.language).toBe('de');
     });
     expect(document.documentElement.lang).toBe('de');
+    expect(usePrefs.getState().languageOverride).toBe('de');
   });
 
   it('renders each picker option in its own script', () => {
-    render(<App />);
+    renderWithProviders(<App />);
 
-    const select = screen.getByRole('combobox');
+    const select = getLanguagePicker();
     const options = Array.from(select.querySelectorAll('option')).map((o) => ({
       value: o.value,
       label: o.textContent,
@@ -76,11 +95,11 @@ describe('<App />', () => {
     expect(options.find((o) => o.value === 'fi')?.label?.toLowerCase()).toContain('suomi');
   });
 
-  it("persists the user's chosen language to localStorage", async () => {
+  it("persists the user's chosen language to localStorage (i18next side)", async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderWithProviders(<App />);
 
-    await user.selectOptions(screen.getByRole('combobox'), 'sv');
+    await user.selectOptions(getLanguagePicker(), 'sv');
 
     await waitFor(() => {
       expect(window.localStorage.getItem(STORAGE_KEY)).toBe('sv');

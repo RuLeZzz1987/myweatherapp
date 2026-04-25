@@ -5,12 +5,21 @@
     "tagline": "Personalized weather, in your language."
   },
   "header": {
+    "searchLabel": "Search for a city",
     "searchPlaceholder": "Search for a city",
     "languageLabel": "Language",
+    "unitsLabel": "Units",
     "unit": {
       "metric": "°C",
       "imperial": "°F"
     }
+  },
+  "search": {
+    "resultLocation": "{{name}}, {{country}}",
+    "resultLocationWithRegion": "{{name}}, {{admin1}}, {{country}}",
+    "noResults": "No matches",
+    "loading": "Searching…",
+    "error": "Couldn't search. Try again."
   },
   "empty": {
     "prompt": "Search for a city to see the weather",

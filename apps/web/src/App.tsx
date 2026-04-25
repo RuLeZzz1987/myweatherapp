@@ -1,53 +1,51 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { SUPPORTED_LOCALES, type SupportedLocale } from './i18n';
-import { formatLanguage } from './i18n/format';
+import { AppHeader } from './components/AppHeader';
+import type { GeocodeResult } from './lib/api/types';
 
 /**
- * Step 5/6a placeholder — proves the i18n + Tailwind v4 foundation works
- * end-to-end:
- *   - First paint is in the resolved locale (URL > localStorage > navigator)
- *   - Switching the picker re-renders strings without a reload, persists to
- *     localStorage, and updates `<html lang>`
- *   - All visual styles come from Tailwind v4 utilities backed by the
- *     `@theme` tokens in `index.css`, so swapping a token (e.g. surface
- *     color) re-themes the whole UI
+ * Step 6b shell — the wireframe's three zones are now in place:
+ *   1. AppHeader (brand + units toggle + language picker + search)
+ *   2. Hero (currently the empty state from SPEC §5.6 — "Search for a
+ *      city to see the weather"; the real CurrentWeatherHero, the
+ *      WeatherIllustration, and the Recent Searches strip land in §10
+ *      step 7)
+ *   3. AttributionFooter
  *
- * The wireframe-faithful header (real combobox + units toggle + recent
- * searches strip + hero) lands in §10 step 6b/7. This page is intentionally
- * sparse — only what's needed to demo i18n and verify the styling pipeline
- * compiles + ships in the bundle.
+ * Selecting a city from the SearchBar bubbles up here so we can show
+ * the chosen name in the hero (proof that the wiring works end-to-end);
+ * the actual `useWeather` query and rendering arrive in §10 step 7.
  */
 function App() {
-  const { t, i18n } = useTranslation();
-  const activeLang = i18n.resolvedLanguage ?? i18n.language;
+  const { t } = useTranslation();
+  const [selected, setSelected] = useState<GeocodeResult | null>(null);
 
   return (
-    <main className="mx-auto flex min-h-svh max-w-3xl flex-col gap-12 px-6 py-10">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
-        <h1 className="text-xl font-medium">{t('brand')}</h1>
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-muted">{t('header.languageLabel')}:</span>
-          <select
-            value={activeLang}
-            onChange={(e) => {
-              void i18n.changeLanguage(e.target.value as SupportedLocale);
-            }}
-            className="rounded-md border border-border bg-surface px-2 py-1 font-sans text-text"
-          >
-            {SUPPORTED_LOCALES.map((code) => (
-              <option key={code} value={code}>
-                {formatLanguage(code, code)}
-              </option>
-            ))}
-          </select>
-        </label>
-      </header>
+    <main className="mx-auto flex min-h-svh max-w-5xl flex-col gap-12 px-6 py-6">
+      <AppHeader onCitySelect={setSelected} />
 
       <section className="flex flex-1 flex-col items-center justify-center text-center">
-        <h2 className="text-2xl">{t('app.greeting')}</h2>
-        <p className="mt-2 text-muted">{t('app.tagline')}</p>
-        <p className="mt-8 text-muted">{t('empty.prompt')}</p>
+        {selected ? (
+          <>
+            <h2 className="text-3xl font-light">{selected.name}</h2>
+            <p className="mt-2 text-muted">
+              {selected.country}
+              {selected.admin1 ? ` · ${selected.admin1}` : ''}
+            </p>
+            <p className="mt-8 text-sm text-muted">
+              {/* Hero comes online in §10 step 7 — for now just confirm the
+                  selection round-tripped. */}
+              {t('app.tagline')}
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl">{t('app.greeting')}</h2>
+            <p className="mt-2 text-muted">{t('app.tagline')}</p>
+            <p className="mt-8 text-muted">{t('empty.prompt')}</p>
+          </>
+        )}
       </section>
 
       <footer className="text-center text-xs text-muted">
