@@ -1,38 +1,42 @@
 /**
  * MyWeather — Cloudflare Worker entry point.
  *
- * Scaffolding stub. Routes (`/api/geocode`, `/api/weather`), the
- * `WeatherCache` Durable Object, and the Open-Meteo upstream client
- * are added in SPEC.md §10 step 3.
+ * Single Worker that serves both the SPA (via the Static Assets binding)
+ * and the JSON `/api/*` surface defined in SPEC.md §4.
  */
 
-export interface Env {
-  // Bound in wrangler.toml — see SPEC.md §4.5.
-  WEATHER_CACHE: DurableObjectNamespace;
-  ASSETS: Fetcher;
-  APP_ENV: string;
-}
+import { Hono } from 'hono';
+
+import { geocodeRoute } from './routes/geocode';
+import { weatherRoute } from './routes/weather';
+import type { Env } from './types';
+
+export { WeatherCache } from './do/WeatherCache';
+
+const VERSION = '0.1.0';
+
+const api = new Hono<{ Bindings: Env }>()
+  .get('/health', (c) => c.json({ ok: true, version: VERSION, env: c.env.APP_ENV }))
+  .route('/geocode', geocodeRoute)
+  .route('/weather', weatherRoute)
+  .notFound((c) => c.json({ error: 'not_found' }, 404))
+  .onError((err, c) => {
+    console.error('API error:', err);
+    return c.json({ error: 'internal', message: err.message }, 500);
+  });
+
+const app = new Hono<{ Bindings: Env }>().route('/api', api);
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname === '/api/health') {
-      return Response.json({ ok: true, env: env.APP_ENV ?? 'development' });
-    }
-
-    if (url.pathname.startsWith('/api/')) {
-      return Response.json({ error: 'not_implemented' }, { status: 501 });
+    if (url.pathname.startsWith('/api')) {
+      return app.fetch(request, env, ctx);
     }
 
     return env.ASSETS.fetch(request);
   },
 } satisfies ExportedHandler<Env>;
 
-export class WeatherCache implements DurableObject {
-  // Real implementation lands in step 3 (SQLite-backed cache, GC alarm).
-  // Constructor intentionally minimal; bindings will be wired up then.
-  async fetch(_request: Request): Promise<Response> {
-    return Response.json({ error: 'not_implemented' }, { status: 501 });
-  }
-}
+export type { Env } from './types';
