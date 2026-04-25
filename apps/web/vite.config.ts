@@ -13,6 +13,16 @@ import tailwindcss from '@tailwindcss/vite';
  */
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    // Force a single `i18next` instance across the bundle. Without this,
+    // Vite's dep optimizer pre-bundles one copy for our app code (which
+    // imports the singleton via `src/i18n/index.ts`) and a separate copy
+    // for `react-i18next`, so `useTranslation()` reads from a different
+    // i18n instance than the one we configure — leading to a stale
+    // `i18n.resolvedLanguage` in the LanguagePicker on first paint with a
+    // non-English persisted locale.
+    dedupe: ['i18next', 'react-i18next'],
+  },
   server: {
     port: 5173,
     strictPort: true,

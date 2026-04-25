@@ -25,6 +25,21 @@ describe('<LanguagePicker />', () => {
     expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue('en');
   });
 
+  it('shows the active language even when only en resources are loaded', async () => {
+    // Simulate the cold-reload case where i18n.language has been set to a
+    // non-English locale but the catalog hasn't been registered yet — at
+    // that moment i18next.resolvedLanguage falls back to `en`. The picker
+    // must surface the user's actual language pick, not the fallback.
+    await i18n.changeLanguage('en');
+    i18n.language = 'fr';
+    try {
+      renderWithProviders(<LanguagePicker />);
+      expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue('fr');
+    } finally {
+      await i18n.changeLanguage('en');
+    }
+  });
+
   it('updates i18n + prefs when the user picks a new locale', async () => {
     const user = userEvent.setup();
     renderWithProviders(<LanguagePicker />);

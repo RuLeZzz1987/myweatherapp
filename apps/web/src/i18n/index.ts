@@ -107,7 +107,15 @@ i18next.on('languageChanged', (lng) => {
   syncHtmlLang(lng);
 });
 
-void loadCatalog(initialLocale);
+// At init time only the `en` bundle is registered (it's the only one
+// imported statically). For non-English initial locales we need to
+// load the catalog AND re-emit changeLanguage so i18next re-resolves
+// the fallback chain — otherwise `i18n.resolvedLanguage` stays pinned
+// to `en` (the only language with resources at init), even though
+// `i18n.language` and `t()` are correct.
+if (initialLocale !== DEFAULT_LOCALE) {
+  void loadCatalog(initialLocale).then(() => i18next.changeLanguage(initialLocale));
+}
 syncHtmlLang(initialLocale);
 
 export default i18next;

@@ -26,8 +26,12 @@ export function LanguagePicker() {
   const { t, i18n } = useTranslation();
   const setOverride = usePrefs((s) => s.setLanguageOverride);
   const labelId = useId();
+  // Prefer `language` (the user's chosen/active locale) over
+  // `resolvedLanguage` (the closest locale with a loaded resource bundle).
+  // For the dropdown UX, what matters is what the user picked — and on a
+  // cold reload `resolvedLanguage` lags briefly while the catalog imports.
   const activeLang =
-    (i18n.resolvedLanguage as SupportedLocale | undefined) ?? (i18n.language as SupportedLocale);
+    (i18n.language as SupportedLocale | undefined) ?? (i18n.resolvedLanguage as SupportedLocale);
 
   return (
     <label className="flex items-center gap-2 text-sm">
